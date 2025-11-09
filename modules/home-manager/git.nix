@@ -12,7 +12,7 @@
     settings = {
       user = {
         name = "teeaychem";
-        email = "bsparkes@stanford.edu";
+        email = "ben@sparkes.uk.net";
       };
       core = {
         pager = "delta";
