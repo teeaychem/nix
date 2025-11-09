@@ -1,5 +1,6 @@
-{pkgs, ...}: {
-  home.packages = with pkgs; [    
+{ pkgs, ... }:
+{
+  home.packages = with pkgs; [
     git
     delta
     git-filter-repo
@@ -39,13 +40,13 @@
         enabled = false;
       };
       status = {
-        short = true;
+        short = false;
         branch = true;
       };
-      
+
       alias = {
         l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human";
-       };
+      };
     };
   };
 }

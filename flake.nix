@@ -9,19 +9,21 @@
     };
   };
 
-  outputs = inputs @ {
-    nixpkgs,
-    home-manager,
-    ...
-  }: {
-    homeConfigurations = {
-      "sparkes" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-        modules = [./home.nix];
-        extraSpecialArgs = {
-          inherit inputs;
+  outputs =
+    inputs@{
+      nixpkgs,
+      home-manager,
+      ...
+    }:
+    {
+      homeConfigurations = {
+        "sparkes" = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+          modules = [ ./home.nix ];
+          extraSpecialArgs = {
+            inherit inputs;
+          };
         };
       };
     };
-  };
 }

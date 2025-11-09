@@ -1,4 +1,5 @@
-{config, ...}: {
+{ config, ... }:
+{
   nixpkgs.config.allowUnfreePredicate = pkg: true;
   home = {
     stateVersion = "25.05";
@@ -15,5 +16,6 @@
 
   programs.home-manager.enable = true;
   programs.starship.enable = true;
-  imports = [./modules/home-manager];
+
+  imports = [ ./modules/home-manager ];
 }
