@@ -7,6 +7,7 @@
     fd
     fzf
     gnugrep
+    neovim
     nixfmt-rfc-style
     ripgrep
     starship
