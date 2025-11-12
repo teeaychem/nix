@@ -4,6 +4,7 @@
   home.packages = with pkgs; [
     bat
     cmake
+    direnv
     fd
     fzf
     gnugrep

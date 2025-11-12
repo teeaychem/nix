@@ -652,6 +652,13 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 #+end_src
 
+** envrc
+
+#+begin_src emacs-lisp
+(use-package envrc
+  :hook (after-init . envrc-global-mode))
+#+end_src
+
 ** exec-path-from-shell
 
 #+begin_src emacs-lisp
@@ -1572,6 +1579,7 @@ maybe: https://github.com/casouri/eldoc-box
                                                              "--background-index"
                                                              "--clang-tidy"
                                                              "--completion-style=detailed"
+                                                             "--header-insertion-decorators"
                                                              "--fallback-style=None")))
   (add-to-list 'eglot-server-programs '(python-mode . ("basedpyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
