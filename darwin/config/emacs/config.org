@@ -105,6 +105,7 @@ from https://github.com/howardabrams/dot-files/blob/master/emacs.org
     (delete-region (point) (progn (backward-word arg) (point))))
 
   :bind (("M-DEL" . backward-delete-word)
+         ("C-<backspace>" . backward-delete-word)
          ("C-k" . forward-delete-line)
          ("C-x k" . kill-current-buffer)
          ("C-x K" . kill-buffer)))
