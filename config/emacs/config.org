@@ -1677,8 +1677,7 @@ for rust dev
   :hook ((c-ts-mode . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
 
-  :commands (lsp lsp-deferred)
-)
+  :commands (lsp lsp-deferred))
 
 (defun lsp-if-in-workspace ()
   (interactive "D")
@@ -1694,21 +1693,21 @@ for rust dev
 #+end_src
 
 #+begin_src emacs-lisp
-(defun all-buffers-disable-mode (mode-toggle)
+(defun global-disable-mode (mode-toggle)
   (interactive "a")
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
       (funcall mode-toggle -1))))
 
-(defun lsp-tmp ()
-  (interactive)
-  (mapcar
-   (lambda (buffer) (with-current-buffer buffer
-                      (if (and (eq lsp-mode t) (not (lsp-workspace-root default-directory)))
-                          (funcall lsp-disconnect)
-                          (funcall lsp-mode -1)
-                          (message "Disabled lsp-mode for " (buffer-name buffer)))))
-   (buffer-list)))
+;; (defun lsp-tmp ()
+;;   (interactive)
+;;   (mapcar
+;;    (lambda (buffer) (with-current-buffer buffer
+;;                       (if (and (eq lsp-mode t) (not (lsp-workspace-root default-directory)))
+;;                           (funcall lsp-disconnect)
+;;                           (funcall lsp-mode -1)
+;;                           (message "Disabled lsp-mode for " (buffer-name buffer)))))
+;;    (buffer-list)))
 
 #+end_src
 
