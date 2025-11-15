@@ -1581,7 +1581,7 @@ maybe: https://github.com/casouri/eldoc-box
                                                              "--completion-style=detailed"
                                                              "--header-insertion-decorators"
                                                              "--fallback-style=None")))
-  (add-to-list 'eglot-server-programs '(python-mode . ("basedpyright-langserver" "--stdio")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
 )
 #+end_src
@@ -1723,6 +1723,18 @@ for rust dev
   #+begin_src emacs-lisp
 (use-package consult-lsp
   :after lsp-mode)
+#+end_src
+
+- python
+
+  #+begin_src emacs-lisp
+(use-package lsp-pyright
+  :defer t
+  :custom (lsp-pyright-langserver-command "pyright")
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp-deferred))))
+
 #+end_src
 
 * treesit
