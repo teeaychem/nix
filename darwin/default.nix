@@ -14,7 +14,8 @@
     packages = with pkgs; [
       bat
       cmake
-      direnv
+      cvc5
+      # emacs-derived
       fd
       fzf
       gnugrep
@@ -24,9 +25,12 @@
       starship
       tmux
       zoxide
+      z3
     ];
   };
 
+  programs.direnv.enable = true;
+  programs.fish.enable = true;
   programs.home-manager.enable = true;
   programs.starship.enable = true;
 
