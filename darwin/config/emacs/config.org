@@ -550,8 +550,8 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (apheleia-mode-hook nil)
 
   :config
-  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
                                                         "-style={BasedOnStyle: LLVM, ColumnLimit: 0}"
@@ -1217,6 +1217,14 @@ https://github.com/radian-software/apheleia/issues/278
   :mode "\\.toml\\'")
 #+end_src
 
+* search
+
+** rg
+
+#+begin_src emacs-lisp
+(use-package rg)
+#+end_src
+
 * completion
 
 ** cape
@@ -1535,6 +1543,8 @@ https://github.com/Qkessler/consult-project-extra
 (push ".DS_store" completion-ignored-extensions)
 #+end_src
 
+* lsp
+
 * eglot
 
 maybe: https://github.com/casouri/eldoc-box
@@ -1547,6 +1557,7 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-extend-to-xref t)
   (corfu-preview-current nil)
   (eglot-code-action-indicator nil)
+  (eglot-events-buffer-config '(:size 0 :format short))
   ;; (eglot-confirm-server-edits t)
 
   (fset #'jsonrpc--log-event #'ignore)
@@ -1592,13 +1603,17 @@ maybe: https://github.com/casouri/eldoc-box
                                                              "--completion-style=detailed"
                                                              "--header-insertion-decorators"
                                                              "--fallback-style=None")))
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver"
+  ;;                                                      "--skipunannotated"
+  ;;                                                      "--stdio")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("pyrefly" "lsp")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
-)
+  )
 #+end_src
 
-- eglot-booster
+** extensions
 
+*** eglot-booster
 #+begin_src emacs-lisp
 (use-package eglot-booster
   :if (memq system-type '(darwin))
@@ -1608,9 +1623,7 @@ maybe: https://github.com/casouri/eldoc-box
   :config
   (eglot-booster-mode))
 #+end_src
-
-- eglot-x
-
+*** eglot-x
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions
 for rust dev
 
@@ -1623,9 +1636,7 @@ for rust dev
   :config
   (eglot-x-setup))
 #+end_src
-
-- eglot-tempel
-
+*** eglot-tempel
 #+begin_src emacs-lisp
 (use-package eglot-tempel
   :after eglot
@@ -1633,15 +1644,40 @@ for rust dev
   :init
   (eglot-tempel-mode t))
 #+end_src
-
-- consult
-
+*** consult
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :after eglot)
 #+end_src
+** workspaces
 
-* lsp-mode
+#+begin_src emacs-lisp
+(add-hook 'python-base-mode-hook
+          (lambda ()
+            (setq-default eglot-workspace-configuration
+                          '((:pyright . (
+                                         :analyzeUnannotatedFunctions :json-false
+                                         :reportAttributeAccessIssue :json-false
+                                         :reportGeneralTypeIssues :json-false
+                                         :reportMissingTypeStubs :json-false
+                                         :reportPropertyTypeMismatch :json-false
+                                         :reportUnusedClass :json-false
+                                         :reportUnusedFunction :json-false
+                                         :reportUnusedImport :json-false
+                                         :reportUnusedVariable :json-false
+                                         :strictParameterNoneValue :json-false
+                                         :typeCheckingMode "off"
+                                         :useLibraryCodeForTypes :json-false
+                                         :verboseOutput :json-false                                         
+                                         )
+                                      )
+                            )
+                          )
+            )
+          )
+#+end_src
+
+* COMMENT lsp-mode
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
