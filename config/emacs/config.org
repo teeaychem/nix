@@ -513,6 +513,14 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 (use-package compile-angel
   :demand t
   :delight compile-angel-on-load-mode
+  :init
+  (push "early-init.el" compile-angel-excluded-files)
+  (push "config.el" compile-angel-excluded-files)
+  (push "init.el" compile-angel-excluded-files)
+
+  (with-eval-after-load "savehist"
+  (push (concat "/" (file-name-nondirectory savehist-file))
+        compile-angel-excluded-files))
   :config
   (setq compile-angel-verbose t)
 
