@@ -4,11 +4,11 @@
 
 (setenv "LIBRARY_PATH"
 	(mapconcat 'identity
-	 '(
-       "/opt/homebrew/opt/gcc/lib/gcc/current"
-       "/opt/homebrew/opt/libgccjit/lib/gcc/current"
-       "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
-         ":"))
+	           '(
+                     "/opt/homebrew/opt/gcc/lib/gcc/current"
+                     "/opt/homebrew/opt/libgccjit/lib/gcc/current"
+                     "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
+                   ":"))
 
 
 (require 'package)
@@ -31,18 +31,19 @@
 
 (package-initialize)
 
-
 (when (not (file-directory-p (expand-file-name "elpa" user-emacs-directory)))
   (package-refresh-contents)
   (package-install-selected-packages))
 
 (setq use-package-verbose t)
-(setq package-enable-at-startup nil) ;; don't make installed packages available before loading the init.el file.
 (setq use-package-always-ensure t)
 
 (setq vc-follow-symlinks t) ;; always open the file a symlink points to
 
-;; load config.org
+
+;; load a fresh tangle of config.org
+(if (file-exists-p (expand-file-name "config.el" user-emacs-directory))
+    (delete-file (expand-file-name "config.el" user-emacs-directory)))
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 
 (require 'server)
