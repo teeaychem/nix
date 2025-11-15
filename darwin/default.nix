@@ -16,6 +16,7 @@
       cmake
       cvc5
       # emacs-derived
+      emacs-lsp-booster
       fd
       fzf
       gnugrep
