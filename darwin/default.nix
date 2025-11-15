@@ -36,6 +36,9 @@
 
   xdg.enable = true;
 
-  imports = [ ../common/git.nix ];
+  imports = [
+    ../common/git.nix
+    ../common/tmux.nix
+  ];
 
 }
