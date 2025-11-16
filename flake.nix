@@ -2,18 +2,20 @@
   description = "dotfiles";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    # nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -66,7 +68,15 @@
         { config, pkgs, ... }:
         {
           # $ nix-env -qaP
-          environment.systemPackages = [
+          environment.systemPackages = with pkgs; [
+            bat
+            fd
+            fzf
+            nixfmt-rfc-style
+            ripgrep
+            starship
+            tmux
+            zoxide
           ];
           environment.shells = with pkgs; [
             bash
