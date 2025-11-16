@@ -1546,6 +1546,7 @@ https://github.com/Qkessler/consult-project-extra
 * lsp
 
 * eglot
+** eglot
 
 maybe: https://github.com/casouri/eldoc-box
 
@@ -1607,7 +1608,6 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   )
 #+end_src
-
 ** extensions
 
 *** eglot-booster
@@ -1648,30 +1648,38 @@ for rust dev
 #+end_src
 ** workspaces
 
+pyrefly seems to panic with an empty workspace configuration, so something minimal for the moment...
 #+begin_src emacs-lisp
 (add-hook 'python-base-mode-hook
           (lambda ()
             (setq-default eglot-workspace-configuration
-                          '((:pyright . (
-                                         :analyzeUnannotatedFunctions :json-false
-                                         :reportAttributeAccessIssue :json-false
-                                         :reportGeneralTypeIssues :json-false
-                                         :reportMissingTypeStubs :json-false
-                                         :reportPropertyTypeMismatch :json-false
-                                         :reportUnusedClass :json-false
-                                         :reportUnusedFunction :json-false
-                                         :reportUnusedImport :json-false
-                                         :reportUnusedVariable :json-false
-                                         :strictParameterNoneValue :json-false
-                                         :typeCheckingMode "off"
-                                         :useLibraryCodeForTypes :json-false
-                                         :verboseOutput :json-false                                         
-                                         )
-                                      )
-                            )
-                          )
-            )
-          )
+                          '((:pyright . (:typeCheckingMode "off"))))))
+#+end_src
+
+#+begin_src emacs-lisp
+;; (add-hook 'python-base-mode-hook
+;;           (lambda ()
+;;             (setq-default eglot-workspace-configuration
+;;                           '((:pyright . (
+;;                                          :analyzeUnannotatedFunctions :json-false
+;;                                          :reportAttributeAccessIssue :json-false
+;;                                          :reportGeneralTypeIssues :json-false
+;;                                          :reportMissingTypeStubs :json-false
+;;                                          :reportPropertyTypeMismatch :json-false
+;;                                          :reportUnusedClass :json-false
+;;                                          :reportUnusedFunction :json-false
+;;                                          :reportUnusedImport :json-false
+;;                                          :reportUnusedVariable :json-false
+;;                                          :strictParameterNoneValue :json-false
+;;                                          :typeCheckingMode "off"
+;;                                          :useLibraryCodeForTypes :json-false
+;;                                          :verboseOutput :json-false                                         
+;;                                          )
+;;                                       )
+;;                             )
+;;                           )
+;;             )
+;;           )
 #+end_src
 
 * COMMENT lsp-mode
