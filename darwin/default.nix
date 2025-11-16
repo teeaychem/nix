@@ -30,16 +30,21 @@
     ];
   };
 
-  programs.direnv.enable = true;
-  programs.fish.enable = true;
-  programs.home-manager.enable = true;
-  programs.starship.enable = true;
+  programs = {
+    direnv.enable = true;
+    fish.enable = true;
+    home-manager.enable = true;
+    starship = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+  };
 
   xdg.enable = true;
 
   imports = [
-    ../common/git.nix
-    ../common/tmux.nix
-  ];
+      ../common/git.nix
+      ../common/tmux.nix
+    ];
 
 }
