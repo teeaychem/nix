@@ -63,12 +63,13 @@
       };
 
       darwin-config =
-        { pkgs, ... }:
+        { config, pkgs, ... }:
         {
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
           environment.systemPackages = [
           ];
+          environment.shells = with pkgs; [ bash fish zsh ];
 
           nix.settings.experimental-features = "nix-command flakes";
 
@@ -109,6 +110,12 @@
           ];
           homebrew.caskArgs.no_quarantine = true;
 
+          programs.fish.enable = true;
+          users.knownUsers = [ config.system.primaryUser ];
+          users.users.${config.system.primaryUser} = {
+            uid = 501;
+            shell = pkgs.fish;
+          };
         };
 
     in
