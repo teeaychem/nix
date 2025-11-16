@@ -1603,9 +1603,6 @@ maybe: https://github.com/casouri/eldoc-box
                                                              "--completion-style=detailed"
                                                              "--header-insertion-decorators"
                                                              "--fallback-style=None")))
-  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver"
-  ;;                                                      "--skipunannotated"
-  ;;                                                      "--stdio")))
   (add-to-list 'eglot-server-programs '(python-mode . ("pyrefly" "lsp")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   )
