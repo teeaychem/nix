@@ -35,10 +35,10 @@ end
 # end
 
 # clingo
-if command -v clingo >/dev/null 2>&1
-    set -gx CLINGO_LIBRARY_PATH "$HOMEBREW_PREFIX/opt/clingo/lib"
-    set -gx LD_LIBRARY_PATH "$LD_LIBRARY_PATH:$CLINGO_LIBRARY_PATH"
-end
+# if command -v clingo >/dev/null 2>&1
+#     set -gx CLINGO_LIBRARY_PATH "$HOMEBREW_PREFIX/opt/clingo/lib"
+#     set -gx LD_LIBRARY_PATH "$LD_LIBRARY_PATH:$CLINGO_LIBRARY_PATH"
+# end
 
 # conan // https://docs.conan.io/2/reference/environment.html#environment-variables
 # set -gx CONAN_HOME "$XDG_CONFIG_HOME/conan2"
@@ -78,16 +78,6 @@ set -gx ELAN_HOME "$XDG_DATA_HOME/elan"
 # less
 set -gx LESSHISTFILE "$XDG_STATE_HOME/less/history"
 
-# llvm / clang, etc.
-if brew_ok
-    fish_add_path "$HOMEBREW_PREFIX/opt/llvm/bin"
-end
-
-#m4
-if brew_ok
-    fish_add_path "$HOMEBREW_PREFIX/opt/m4/bin"
-end
-
 # man
 set -x MANPAGER "nvim +Man!"
 
@@ -120,10 +110,6 @@ source "$HOME/.cargo/env.fish"
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
-function fzfp
-    fzf --style full --preview \'fzf-preview.sh {}\' --bind \'focus:transform-header:file --brief {}\'
-end
-
 # setup
 
 if status is-interactive
@@ -131,11 +117,9 @@ if status is-interactive
 end
 starship init fish | source
 
-# fzf
+set -x FZF_DEFAULT_OPTS_FILE $XDG_CONFIG_HOME/fzf/default_ops
 fzf --fish | source
 
-# zoxide
 zoxide init fish | source
-
 
 direnv hook fish | source
