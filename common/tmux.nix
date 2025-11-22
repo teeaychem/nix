@@ -22,6 +22,7 @@
         extraConfig = ''
           set -g @resurrect-strategy-nvim 'session'
           set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-dir '$XDG_CACHE_HOME/tmux'
         '';
       }
       {
