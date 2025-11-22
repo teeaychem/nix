@@ -8,7 +8,11 @@
 # https://github.com/d12frosted/homebrew-emacs-plus
 
 self: super: rec {
-  emacs-derived = super.emacs-unstable.override { };
+  emacs-derived = super.emacs-unstable.override {
+    withNativeCompilation = true;
+    withTreeSitter = true;
+    withImageMagick = true;
+  };
   emacs-derived-plus =
     if super.stdenv.isDarwin then
       emacs-derived.overrideAttrs (old: {
