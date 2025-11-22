@@ -70,12 +70,18 @@
           # $ nix-env -qaP
           environment.systemPackages = with pkgs; [
             bat
+            coreutils
             fd
             fzf
+            hunspell
+            imagemagick
+            neovim
             nixfmt-rfc-style
+            pkgconf
             ripgrep
             starship
             tmux
+            typos
             zoxide
           ];
           environment.shells = with pkgs; [

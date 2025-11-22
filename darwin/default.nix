@@ -13,12 +13,17 @@
 
     packages = with pkgs; [
       cmake
-      cvc5
       # emacs-derived
       emacs-lsp-booster
       gnugrep
-      neovim
+
+      cvc5
       z3
+
+      gersemi
+      ruff
+      rust-analyzer
+      taplo
     ];
   };
 
