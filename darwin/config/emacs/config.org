@@ -25,20 +25,6 @@ from https://github.com/howardabrams/dot-files/blob/master/emacs.org
 #+end_src
 
 * general
-** mac
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :if (memq system-type '(darwin))
-  :custom
-  (mac-command-modifier 'meta)
-  (mac-option-modifier 'option)
-  (mac-right-option-modifier 'left)
-  (mac-control-modifier 'control)
-  (mac-pass-command-to-system t)
-  (menu-bar-mode t)
-  (setq-default trash-directory "~/.Trash/emacs"))
-#+end_src
 ** emacs
 
 #+begin_src emacs-lisp
@@ -254,18 +240,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (treesit-font-lock-level 4))
 #+end_src
 
-#+begin_src emacs-lisp
-(use-package emacs
-  :if (memq system-type '(darwin))
-  :init
-  (set-face-attribute 'default nil
-                      :family "M+1Code Nerd Font Mono"; "Maple Mono NF" "JuliaMono"
-                      :height 150)
-
-  :custom
-  (ns-use-thin-smoothing t)
-  (mac-allow-anti-aliasing t))
-#+end_src
 ** themes
 *** doom
 
@@ -486,6 +460,21 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (set-face-attribute 'which-key-local-map-description-face nil :weight 'bold))
 #+end_src
 
+* other configs
+
+#+begin_src emacs-lisp
+(defun load-config (name)
+  (message (concat "Request to load config: " name))
+  (let* ((file-el (expand-file-name (concat name ".el") user-emacs-directory))
+         (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
+    (if (file-exists-p file-el) (delete-file file-el) (message (concat "Did not find " file-el)))
+    (if (file-exists-p file-org) (org-babel-load-file file-org) (message (concat "Did not find " file-org)))))
+#+end_src
+
+#+begin_src emacs-lisp
+(load-config "config-darwin")
+#+end_src
+
 * external, etc.
 ** compile-angel
 
@@ -640,22 +629,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :custom
   (envrc-show-summary-in-minibuffer nil)
   :hook (after-init . envrc-global-mode))
-#+end_src
-** exec-path-from-shell
-
-#+begin_src emacs-lisp
-(use-package exec-path-from-shell
-  :pin melpa-stable
-  :if (memq system-type '(darwin))
-  :demand
-  :init
-  (setq exec-path-from-shell-arguments '("-l"))
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "DICPATH"))
-#+end_src
-
-#+begin_src emacs-lisp
-;; (getenv "PATH")
 #+end_src
 ** fzf
 
@@ -1538,11 +1511,10 @@ maybe: https://github.com/casouri/eldoc-box
   )
 #+end_src
 *** extensions
-
 *** eglot-booster
 #+begin_src emacs-lisp
 (use-package eglot-booster
-  :if (memq system-type '(darwin))
+  ;; :if (memq system-type '(darwin))
   :vc (eglot-booster :url "https://github.com/jdtsmith/eglot-booster"
                      :rev :newest)
   :after eglot

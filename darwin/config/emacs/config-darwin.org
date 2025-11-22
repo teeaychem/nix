@@ -1,0 +1,51 @@
+-*- mode: org -*-
+#+startup: show2levels
+#+PROPERTY: header-args :comment no :lexical t :results silent
+
+
+* general
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :if (memq system-type '(darwin))
+  :custom
+  (mac-command-modifier 'meta)
+  (mac-option-modifier 'option)
+  (mac-right-option-modifier 'left)
+  (mac-control-modifier 'control)
+  (mac-pass-command-to-system t)
+  (menu-bar-mode t)
+  (setq-default trash-directory "~/.Trash/emacs"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :if (memq system-type '(darwin))
+  :init
+  (set-face-attribute 'default nil
+                      :family "M+1Code Nerd Font Mono"; "Maple Mono NF" "JuliaMono"
+                      :height 150)
+
+  :custom
+  (ns-use-thin-smoothing t)
+  (mac-allow-anti-aliasing t))
+#+end_src
+
+* external, etc.
+
+** exec-path-from-shell
+
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :pin melpa-stable
+  :if (memq system-type '(darwin))
+  :demand
+  :init
+  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "DICPATH"))
+#+end_src
+
+#+begin_src emacs-lisp
+;; (getenv "PATH")
+#+end_src
