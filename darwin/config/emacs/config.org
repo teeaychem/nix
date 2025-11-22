@@ -1479,6 +1479,7 @@ maybe: https://github.com/casouri/eldoc-box
          ("g d" . #'eglot-find-declaration)
          ("g i" . #'eglot-find-implementation)
          ("g t" . #'eglot-find-typeDefinition)
+         ("i" . #'eglot-inlay-hints-mode)
          ("l" . #'eglot)
          ("r" . #'eglot-rename)
          ("s" . #'eglot-shutdown)

@@ -26,8 +26,7 @@
 
 ;; save custom things to separate file, and also load before doing anything else with packages as it contains a useful list
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(when (file-exists-p custom-file)
-  (load custom-file))
+(when (file-exists-p custom-file) (load custom-file))
 
 (package-initialize)
 
@@ -35,10 +34,9 @@
   (package-refresh-contents)
   (package-install-selected-packages))
 
-(setq use-package-verbose t)
+(setq use-package-verbose nil)
 (setq use-package-always-ensure t)
 
-(setq vc-follow-symlinks t) ;; always open the file a symlink points to
 
 
 ;; load a fresh tangle of config.org
