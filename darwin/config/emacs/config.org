@@ -218,7 +218,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (add-hook 'dired-mode-hook #'dired-omit-mode)
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
-  (insert-directory-program "gls") ;; (g)ls --dired
+  (insert-directory-program "ls")
   )
 #+end_src
 ** eldoc
@@ -449,6 +449,9 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (setq compile-angel-verbose t)
   (push "early-init.el" compile-angel-excluded-files)
   (push "config.el" compile-angel-excluded-files)
+  (push "config-darwin.el" compile-angel-excluded-files)
+  (push "config-org.el" compile-angel-excluded-files)
+  (push "custom.el" compile-angel-excluded-files)
   (push "init.el" compile-angel-excluded-files)
 
   (with-eval-after-load "savehist"
@@ -916,8 +919,7 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
     (message "Performing local python setup")
     (setq-local python-shell-interpreter (pet-executable-find "python"))
     (setq-local python-shell-virtualenv-root (pet-virtualenv-root))
-    (pet-eglot-setup)
-    (eglot-ensure))
+    (pet-eglot-setup))
   (add-hook 'python-base-mode-hook 'python-local-setup))
 #+end_src
 ** rust
@@ -1368,19 +1370,9 @@ maybe: https://github.com/casouri/eldoc-box
                                                              "--header-insertion-decorators"
                                                              "--fallback-style=None")))
   (add-to-list 'eglot-server-programs '(python-mode . ("pyrefly" "lsp")))
+  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   )
-#+end_src
-*** extensions
-*** eglot-booster
-#+begin_src emacs-lisp
-(use-package eglot-booster
-  ;; :if (memq system-type '(darwin))
-  :vc (eglot-booster :url "https://github.com/jdtsmith/eglot-booster"
-                     :rev :newest)
-  :after eglot
-  :config
-  (eglot-booster-mode))
 #+end_src
 *** eglot-x
 https://github.com/nemethf/eglot-x#rust-analyzer-extensions
@@ -1428,10 +1420,11 @@ for rust dev
 ;;                                          :useLibraryCodeForTypes :json-false
 ;;                                          :verboseOutput :json-false))))))
 #+end_src
-** COMMENT lsp-mode
+** lsp-mode
 *** lsp-mode
 #+begin_src emacs-lisp
 (use-package lsp-mode
+  :after envrc
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l m")
@@ -1464,17 +1457,16 @@ for rust dev
 
   (lsp-treemacs-sync-mode nil)
 
-  :hook ((c-ts-mode . lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration))
+  :hook ((lsp-mode . lsp-enable-which-key-integration))
 
   :commands (lsp lsp-deferred))
 
-(defun lsp-if-in-workspace ()
-  (interactive "D")
-  (if (lsp-workspace-root default-directory) (lsp)))
+;; (defun lsp-if-in-workspace ()
+;;   (interactive "D")
+;;   (if (lsp-workspace-root default-directory) (lsp)))
 
-(when (featurep 'lsp-mode)
-  (add-hook 'prog-mode-hook 'lsp-if-in-workspace))
+;; (when (featurep 'lsp-mode)
+;;   (add-hook 'prog-mode-hook 'lsp-if-in-workspace))
 
 ;; optionally if you want to use debugger
 ;; (use-package dap-mode)
