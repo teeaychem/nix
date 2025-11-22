@@ -1,0 +1,43 @@
+-*- mode: org -*-
+#+startup: show2levels
+#+PROPERTY: header-args :results silent
+
+* org
+
+#+begin_src emacs-lisp
+(use-package org
+  :defer t
+  :mode ("\\.org" . org-mode)
+
+  :custom
+  (org-directory "~/Documents/Org")
+  (org-agenda-files (file-expand-wildcards "~/Documents/Org/*.org")) ;; Include all org files from a directory into the agenda.
+  (org-default-notes-file (concat org-directory "/OrgCapture.org"))
+  (org-src-fontify-natively t) ;; use syntax-highlighting for src blocks
+  (org-src-preserve-indentation t) ;; preserve indentation in src blocks, don't re-indent
+  (org-src-tab-acts-natively t) ;; respect the src block syntax for tabs
+  (org-startup-truncated nil) ;; wrap lines on startup
+  (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
+  (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
+  (org-hide-emphasis-markers nil) ;; don't hide emphasis markers, because there are soo many
+  (org-pretty-entities t) ;; try to draw utf8 characters, don't just show their code
+  (org-fontify-quote-and-verse-blocks t) ;; add a background to begin_quote and begin_verse blocks.
+  (org-cycle-separator-lines -1) ;; don't collapse blank lines when collapsing a tree
+  (org-tag-column 0) ;; don't align tags
+  (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
+  (org-support-shift-select t)   ;; leave shift keys alone!
+  (org-replace-disputed-keys t)
+
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-list-allow-alphabetical t)
+
+  (org-log-done 'time) ;; Auto add time and closing note to done
+  (org-log-done 'note)
+
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((emacs-lisp . t)
+                                 (org . t)
+                                 (scheme . t))))
+#+end_src

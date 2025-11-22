@@ -5,20 +5,14 @@
 * to investigate
 
 https://www.reddit.com/r/emacs/comments/1ai00g5/more_totally_evident_but_super_useful_emacs/
-
-https://github.com/alexander-miller/treemacs
 https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://editorconfig.org
+
 * temp
 
 #+begin_src emacs-lisp
-(use-package emacs
-  :custom
-  (comint-scroll-to-bottom-on-output t))
 #+end_src
 
 * startup
-
-from https://github.com/howardabrams/dot-files/blob/master/emacs.org
 
 #+begin_src emacs-lisp
 (setq debug-on-error nil)
@@ -39,13 +33,13 @@ from https://github.com/howardabrams/dot-files/blob/master/emacs.org
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   (setq read-extended-command-predicate #'command-completion-default-include-p)
 
-  (setq enable-recursive-minibuffers t)
-
   (setq-default indent-tabs-mode nil)
 
-  (setq tab-always-indent 't)
+  (delete-selection-mode t) ;; delete selected text by typing
 
   (global-auto-revert-mode t) ; for reloading bib files, etc.
+  (global-subword-mode)
+
   (desktop-save-mode)
   (save-place-mode t)
 
@@ -58,59 +52,17 @@ from https://github.com/howardabrams/dot-files/blob/master/emacs.org
   (require-final-newline t)
   (echo-keystrokes 0.1) ;; turn down time to echo keystrokes so no waiting for things to happen.
   (sentence-end-double-space nil)
+  (enable-recursive-minibuffers t)
+  (tab-always-indent t)
 
   (auto-save-interval 200)
 
   (minibuffer-prompt-properties '(read-only t
-                                  cursor-intangible t
-                                  face minibuffer-prompt)) ;; Do not allow the cursor in the minibuffer prompt
-)
-#+end_src
-*** kill / delete /navigation
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (global-subword-mode)
-  (delete-selection-mode t) ;; delete selected text by typing
-
-  (defun foward-delete-word (arg) (interactive "p")
-    (delete-region (point) (progn (forward-word arg) (point))))
-
-  (defun backward-delete-word (arg) (interactive "p")
-    (delete-region (point) (progn (backward-word arg) (point))))
-
-  (defun forward-delete-line (arg) (interactive "p")
-    (delete-region (point) (progn (end-of-line) (point))))
-
-  (defun backward-delete-word (arg) (interactive "p")
-    (delete-region (point) (progn (backward-word arg) (point))))
-
-  :bind (("M-DEL" . backward-delete-word)
-         ("C-<backspace>" . backward-delete-word)
-         ("C-k" . forward-delete-line)
-         ("C-x k" . kill-current-buffer)
-         ("C-x K" . kill-buffer)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package repeat
-  :init (repeat-mode t))
-#+end_src
-*** misc binds
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :bind
-  (("C-z" . ignore)
-   ("C-<wheel-up>" . ignore)
-   ("C-<wheel-down>" . ignore)
-   ("RET" . newline-and-indent)
-   ("<mouse-2>" . ignore) ;; figure out what to do with middle button…
-   ("<mouse-3>" . context-menu-open))
-   ("C-<tab>" . completion-at-point)
+                                            cursor-intangible t
+                                            face minibuffer-prompt))
   )
 #+end_src
+
 *** saving & backups
 
 Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
@@ -121,15 +73,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq-default delete-by-moving-to-trash t)
 
   :custom
-  (savehist-file  (concat user-emacs-directory "var/savehist"))
-  (savehist-additional-variables
-   '(buffer-name-history
-     compile-command
-     extended-command-history
-     file-name-history
-     kill-ring))
-
-  (backup-directory-alist `(("." . ,(concat user-emacs-directory "var/backups"))) ;; change backup location
+  (backup-directory-alist `(("." . ,(concat user-emacs-directory "var/backups")))
                           backup-by-copying t       ; don't clobber symlinks
                           kept-new-versions 10      ; keep 10 latest versions
                           kept-old-versions 0       ; don't bother with old versions
@@ -137,38 +81,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                           version-control t         ; number backups
                           vc-make-backup-files nil) ; backup version controlled files
   )
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package savehist
-  :ensure nil
-  :commands (savehist-mode savehist-save)
-  :hook
-  (after-init . savehist-mode)
-  :custom
-  (savehist-autosave-interval 600)
-  (savehist-additional-variables
-   '(kill-ring                        ; clipboard
-     register-alist                   ; macros
-     mark-ring global-mark-ring       ; marks
-     search-ring regexp-search-ring)))
-
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package recentf
-  :ensure nil
-  :commands (recentf-mode recentf-cleanup)
-  :hook
-  (after-init . recentf-mode)
-
-  :custom
-  (recentf-auto-cleanup (if (daemonp) 300 'never))
-  (recentf-exclude '("COMMIT_EDITMSG\\'"))
-
-  :config
-  ;; to ensure `recentf-cleanup` runs before `recentf-save-list`
-  (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 #+end_src
 *** locale
 
@@ -184,6 +96,48 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (setq locale-coding-system 'utf-8)
 #+end_src
 
+* binds
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :init
+  (defun foward-delete-word (arg) (interactive "p")
+         (delete-region (point) (progn (forward-word arg) (point))))
+
+  (defun backward-delete-word (arg) (interactive "p")
+         (delete-region (point) (progn (backward-word arg) (point))))
+
+  (defun forward-delete-line (arg) (interactive "p")
+         (delete-region (point) (progn (end-of-line) (point))))
+
+  (defun backward-delete-word (arg) (interactive "p")
+         (delete-region (point) (progn (backward-word arg) (point))))
+
+
+  :bind
+  (("C-<wheel-up>" . ignore)
+   ("C-<wheel-down>" . ignore)
+   ("<mouse-2>" . ignore) ;; figure out what to do with middle button…
+   ("<mouse-3>" . context-menu-open)
+
+   ("C-z" . ignore)
+   ("C-<tab>" . completion-at-point)
+   ("C-<backspace>" . backward-delete-word)
+   ("C-k" . forward-delete-line)
+   ("C-x k" . kill-current-buffer)
+   ("C-x K" . kill-buffer)
+
+   ("M-DEL" . backward-delete-word)
+
+   ("RET" . newline-and-indent)
+
+   ("C-c w <left>" . windmove-left)
+   ("C-c w <right>" . windmove-right)
+   ("C-c w <up>" . windmove-up)
+   ("C-c w <down>" . windmove-down)
+   ))
+#+end_src
+
 * visual
 ** display
 
@@ -196,18 +150,21 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (set-frame-parameter nil 'internal-border-width 2)
 
   :custom
+  (comint-scroll-to-bottom-on-output t)
+
   (use-short-answers t)
+
   (uniquify-buffer-name-style 'forward) ; unique buffer names
 
-  (line-number-mode t) ; show line-number in the mode line
   (column-number-mode t) ; show column-number in the mode line
+  (line-number-mode t) ; show line-number in the mode line
 
   (auto-fill-mode t) ;; wrap lines automatically
 
-  (scroll-bar-mode nil)
   (horizontal-scroll-bar-mode nil)
-
   (menu-bar-mode nil)
+  (ns-pop-up-frames nil)
+  (scroll-bar-mode nil)
   (tool-bar-mode nil)
   (tooltip-mode nil)
   (use-dialog-box nil)
@@ -240,59 +197,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (treesit-font-lock-level 4))
 #+end_src
 
-** themes
-*** doom
-
-#+begin_src emacs-lisp
-(use-package doom-themes
-  :config
-  (setq ring-bell-function #'doom-themes-visual-bell-fn visible-bell t))
-#+end_src
-
-#+begin_src emacs-lisp :results silent
-  (use-package doom-themes
-    :disabled
-    :init
-    (setq doom-themes-enable-bold nil)
-    (setq doom-themes-enable-italic t)
-
-    :config
-    (load-theme 'doom-molokai t)
-    ;; (load-theme 'doom-one t)
-
-    (doom-themes-visual-bell-config) ;; enable flashing mode-line on errors
-    (doom-themes-org-config) ;; corrects (and improves) org-mode's native fontification.
-
-    :custom
-    (doom-molokai-brighter-comments t)
-    (doom-molokai-brighter-modeline t)
-    (doom-one-brighter-comments t)
-    (doom-one-brighter-modeline nil))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package catppuccin-theme
-  :config
-  (load-theme 'catppuccin t)
-  (catppuccin-set-color 'text "#ffffff")
-  :custom
-  (catppuccin-flavor 'mocha)
-  (catppuccin-highlight-matches t)
-  (catppuccin-italic-variables t))
-#+end_src
-** frames
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :custom
-  (ns-pop-up-frames nil)
-
-  :bind (("C-c w <left>" . windmove-left)
-         ("C-c w <right>" . windmove-right)
-         ("C-c w <up>" . windmove-up)
-         ("C-c w <down>" . windmove-down)))
-#+end_src
-
 * internal
 
 #+begin_src emacs-lisp
@@ -301,7 +205,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 #+end_src
 ** dired
-
 #+begin_src emacs-lisp
 (use-package emacs
   :init
@@ -319,7 +222,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 #+end_src
 ** eldoc
-
 #+begin_src emacs-lisp :results silent
 (use-package eldoc
   :init
@@ -353,6 +255,51 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                      ("b" . #'eldoc-doc-buffer)
                      ("t" . #'eldoc-print-current-symbol-info)
                      ("q" . #'quit-eldoc-buffer)))
+#+end_src
+** recentf
+
+#+begin_src emacs-lisp
+(use-package recentf
+  :commands (recentf-mode recentf-cleanup)
+  :hook
+  (after-init . recentf-mode)
+
+  :custom
+  (recentf-auto-cleanup (if (daemonp) 300 'never))
+  (recentf-exclude '("COMMIT_EDITMSG\\'"))
+
+  :config
+  ;; to ensure `recentf-cleanup` runs before `recentf-save-list`
+  (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
+#+end_src
+** repeat
+
+#+begin_src emacs-lisp
+(use-package repeat
+  :init (repeat-mode t))
+#+end_src
+** savehist
+
+#+begin_src emacs-lisp
+(use-package savehist
+  :commands (savehist-mode savehist-save)
+  :hook
+  (after-init . savehist-mode)
+  :custom
+  (savehist-file  (concat user-emacs-directory "var/savehist"))
+  (savehist-additional-variables
+   '(buffer-name-history
+     compile-command
+     extended-command-history
+     file-name-history
+     kill-ring))
+  (savehist-autosave-interval 600)
+  (savehist-additional-variables
+   '(kill-ring                        ; clipboard
+     register-alist                   ; macros
+     mark-ring global-mark-ring       ; marks
+     search-ring regexp-search-ring)))
+
 #+end_src
 ** skeletons
 
@@ -395,7 +342,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   )
 #+end_src
 ** isearch
-
 #+begin_src emacs-lisp
 (use-package emacs
   :config
@@ -405,7 +351,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (setq search-whitespace-regexp ".*?"))
 #+end_src
 ** flymake
-
 #+begin_src emacs-lisp :result silent
 (use-package flymake
   :init
@@ -438,7 +383,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (flymake-wrap-around t))
 #+end_src
 ** project
-
 #+begin_src emacs-lisp
 (use-package project
   :config
@@ -446,7 +390,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   )
 #+end_src
 ** which-key
-
 #+begin_src emacs-lisp
 (use-package which-key
   :demand t
@@ -473,11 +416,30 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
 #+begin_src emacs-lisp
 (load-config "config-darwin")
+(load-config "config-org")
+#+end_src
+
+* themes
+
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :config
+  (setq ring-bell-function #'doom-themes-visual-bell-fn visible-bell t))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package catppuccin-theme
+  :config
+  (load-theme 'catppuccin t)
+  (catppuccin-set-color 'text "#ffffff")
+  :custom
+  (catppuccin-flavor 'mocha)
+  (catppuccin-highlight-matches t)
+  (catppuccin-italic-variables t))
 #+end_src
 
 * external, etc.
 ** compile-angel
-
 #+begin_src emacs-lisp
 (use-package compile-angel
   :demand t
@@ -500,7 +462,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (compile-angel-on-load-mode t))
 #+end_src
 ** apheleia
-
 #+begin_src emacs-lisp
 (use-package emacs
   :bind (:prefix-map format-prefix-map
@@ -542,23 +503,26 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   )
 #+end_src
 ** browse kill ring
-
 #+begin_src emacs-lisp
 (use-package browse-kill-ring)
 #+end_src
 ** current-window-only
 
 #+begin_src emacs-lisp
-(use-package current-window-only
-  :ensure t)
+(use-package current-window-only)
+#+end_src
+** devdocs
+
+#+begin_src emacs-lisp
+(use-package devdocs
+  :defer t
+  :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
 ** diminish
-
 #+begin_src emacs-lisp
 (use-package delight)
 #+end_src
 ** dirvish
-
 #+begin_src emacs-lisp
 (use-package emacs
   :config
@@ -571,7 +535,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
 #+begin_src emacs-lisp
 (use-package dirvish
-  :ensure t
   :init
   (dirvish-override-dired-mode)
   :custom
@@ -611,19 +574,16 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
    ("M-e" . dirvish-emerge-menu)))
 #+end_src
 ** COMMENT dumb-jump
-
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :custom
-  (dumb-jump-prefer-searcher 'rg)
-  )
+  (dumb-jump-prefer-searcher 'rg))
 
 (setq xref-backend-functions (remq 'etags--xref-backend xref-backend-functions))
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
 (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 #+end_src
 ** envrc
-
 #+begin_src emacs-lisp
 (use-package envrc
   :custom
@@ -631,7 +591,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :hook (after-init . envrc-global-mode))
 #+end_src
 ** fzf
-
 #+begin_src emacs-lisp :results silent
 (use-package fzf
   :bind
@@ -649,10 +608,8 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
         fzf/window-height 15))
 #+end_src
 ** helpful
-
 #+begin_src emacs-lisp
 (use-package helpful
-  :ensure t
   :commands (helpful-callable
              helpful-variable
              helpful-key
@@ -669,7 +626,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (helpful-max-buffers 7))
 #+end_src
 ** highlight indentation
-
 - To highlight indentations
   - Options are fill, column, and character
   - There's no way to get indentation on empty lines as of now
@@ -688,7 +644,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
 #+begin_src emacs-lisp
 (use-package multiple-cursors
-  :pin melpa-stable
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)
@@ -699,7 +654,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
 #+begin_src emacs-lisp
 (use-package no-littering
-  :pin melpa-stable
   :init
   (require 'recentf)
   (setq auto-save-file-name-transforms
@@ -727,12 +681,11 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :init
   (setq undo-limit (* 64 1024 1024)) ; 64mb.
   (setq undo-strong-limit (* 96 1024 1024)) ; 96mb.
-  (setq undo-outer-limit (* 960 1024 1024)) ; 960mb.
+  (setq undo-outer-limit (* 96 1024 1024)) ; 96mb.
   :config
   (global-set-key (kbd "C-/") 'undo-fu-only-undo)
   (global-set-key (kbd "C-?") 'undo-fu-only-redo))
 #+end_src
-
 
 #+begin_src emacs-lisp
 (use-package undo-fu-session
@@ -745,19 +698,8 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 #+begin_src emacs-lisp
 (use-package vundo
   :config
-  (setq vundo-compact-display t) ;; Take less on-screen space.
-  (global-set-key (kbd "C-x u") 'vundo)
-
-  ;; (define-key vundo-mode-map (kbd "h") #'vundo-backward)
-  ;; (define-key vundo-mode-map (kbd "<left>") #'vundo-backward)
-  ;; (define-key vundo-mode-map (kbd "<down>") #'vundo-next)
-  ;; (define-key vundo-mode-map (kbd "<up>") #'vundo-previous)
-  ;; (define-key vundo-mode-map (kbd "<home>") #'vundo-stem-root)
-  ;; (define-key vundo-mode-map (kbd "<end>") #'vundo-stem-end)
-  ;; (define-key vundo-mode-map (kbd "q") #'vundo-quit)
-  ;; (define-key vundo-mode-map (kbd "C-g") #'vundo-quit)
-  ;; (define-key vundo-mode-map (kbd "RET") #'vundo-confirm))
-)
+  (setq vundo-compact-display t)
+  (global-set-key (kbd "C-x u") 'vundo))
 #+end_src
 ** ws-butler
 
@@ -827,46 +769,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :hook (magit-mode . magit-delta-mode))
 #+end_src
 
-* org
-
-#+begin_src emacs-lisp
-(use-package org
-  :defer t
-  :mode ("\\.org" . org-mode)
-
-  :custom
-  (org-directory "~/Documents/Org")
-  (org-agenda-files (file-expand-wildcards "~/Documents/Org/*.org")) ;; Include all org files from a directory into the agenda.
-  (org-default-notes-file (concat org-directory "/OrgCapture.org"))
-  (org-src-fontify-natively t) ;; use syntax-highlighting for src blocks
-  (org-src-preserve-indentation t) ;; preserve indentation in src blocks, don't re-indent
-  (org-src-tab-acts-natively t) ;; respect the src block syntax for tabs
-  (org-startup-truncated nil) ;; wrap lines on startup
-  (org-catch-invisible-edits 'show-and-error) ;; if editing in an invisible region, complain.
-  (org-confirm-babel-evaluate t) ;; ask when evaluating every src block
-  (org-hide-emphasis-markers nil) ;; don't hide emphasis markers, because there are soo many
-  (org-pretty-entities t) ;; try to draw utf8 characters, don't just show their code
-  (org-fontify-quote-and-verse-blocks t) ;; add a background to begin_quote and begin_verse blocks.
-  (org-cycle-separator-lines -1) ;; don't collapse blank lines when collapsing a tree
-  (org-tag-column 0) ;; don't align tags
-  (org-adapt-indentation nil) ;; prevent demoting heading also shifting text inside sections
-  (org-support-shift-select t)   ;; leave shift keys alone!
-  (org-replace-disputed-keys t)
-
-  (org-fontify-done-headline t)
-  (org-fontify-whole-heading-line t)
-  (org-list-allow-alphabetical t)
-
-  (org-log-done 'time) ;; Auto add time and closing note to done
-  (org-log-done 'note)
-
-  :config
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((emacs-lisp . t)
-                                 (org . t)
-                                 (scheme . t))))
-#+end_src
-
 * languages
 ** COMMENT ASP
 
@@ -897,44 +799,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
                            :rev :newest)
   :custom
   (cobol-tab-width 3))
-#+end_src
-** devdocs
-
-#+begin_src emacs-lisp
-(use-package devdocs
-  :defer t
-  :bind (("C-h D" . 'devdocs-lookup)))
-#+end_src
-** COMMENT fsharp
-
-#+begin_src emacs-lisp
-(use-package fsharp-mode
-  :mode "\\.fsx\\'"
-  :custom
-  (fsharp-tab-always-indent nil)
-  :defer t)
-#+end_src
-
-Ideally, the following would work:
-
-(add-to-list 'eglot-server-programs `(fsharp-mode . ("fsautocomplete" "--adaptive-lsp-server-enabled")))
-
-Though, things aren't ideal and eglot-fsharp does some helpful work.
-So, to prevent attempts to manage the server, overrides are made to a few functions.
-Either override is sufficient at time of writing, though I expect fixing the lastest version to installed to be most robust.
-
-#+begin_src emacs-lisp
-(use-package eglot-fsharp
-  :after fsharp-mode
-  :config
-  (setq eglot-fsharp-server-install-dir nil)
-
-  (defun eglot-fsharp--latest-version ()
-    ;; Overriden to return the installed version
-    (eglot-fsharp--installed-version))
-  (defun eglot-fsharp--maybe-install (&optional version)
-    ;; Overriden to prevent installation
-    nil))
 #+end_src
 ** fish
 
@@ -1107,6 +971,7 @@ https://github.com/radian-software/apheleia/issues/278
                                            (--first (string= (cdr (assq 'manifest_path it)) manifest-path)
                                                     (cdr (assq 'packages metadata))))))))))))
 #+end_src
+
 * markup
 ** json
 
@@ -1118,7 +983,6 @@ https://github.com/radian-software/apheleia/issues/278
 
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :pin melpa-stable
   :defer t
   :mode (("/README\\(?:\\.md\\)?\\'" . gfm-mode)
          ("\\.m[k]d\\'" . gfm-mode))
@@ -1415,8 +1279,6 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp
 (use-package embark
-  :ensure t
-
   :bind (("C-c a" . embark-act)         ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
          ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
@@ -1436,7 +1298,6 @@ https://github.com/Qkessler/consult-project-extra
 #+begin_src emacs-lisp
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t ; only need to install, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
@@ -1462,8 +1323,7 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-code-action-indicator nil)
   (eglot-events-buffer-config '(:size 0 :format short))
   ;; (eglot-confirm-server-edits t)
-
-  (fset #'jsonrpc--log-event #'ignore)
+  (jsonrpc-event-hook nil)
 
   :config
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
@@ -1549,7 +1409,6 @@ for rust dev
   :after eglot)
 #+end_src
 *** workspaces
-
 #+begin_src emacs-lisp
 ;; (add-hook 'python-base-mode-hook
 ;;           (lambda ()
@@ -1567,13 +1426,7 @@ for rust dev
 ;;                                          :strictParameterNoneValue :json-false
 ;;                                          :typeCheckingMode "off"
 ;;                                          :useLibraryCodeForTypes :json-false
-;;                                          :verboseOutput :json-false                                         
-;;                                          )
-;;                                       )
-;;                             )
-;;                           )
-;;             )
-;;           )
+;;                                          :verboseOutput :json-false))))))
 #+end_src
 ** COMMENT lsp-mode
 *** lsp-mode
@@ -1679,7 +1532,7 @@ for rust dev
 
 #+end_src
 
-* treesit
+* tree sitter
 
 https://github.com/renzmann/treesit-auto
 https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html

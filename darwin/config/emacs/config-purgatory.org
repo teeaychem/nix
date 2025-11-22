@@ -1,0 +1,31 @@
+* COMMENT fsharp
+
+#+begin_src emacs-lisp
+(use-package fsharp-mode
+  :mode "\\.fsx\\'"
+  :custom
+  (fsharp-tab-always-indent nil)
+  :defer t)
+#+end_src
+
+Ideally, the following would work:
+
+(add-to-list 'eglot-server-programs `(fsharp-mode . ("fsautocomplete" "--adaptive-lsp-server-enabled")))
+
+Though, things aren't ideal and eglot-fsharp does some helpful work.
+So, to prevent attempts to manage the server, overrides are made to a few functions.
+Either override is sufficient at time of writing, though I expect fixing the lastest version to installed to be most robust.
+
+#+begin_src emacs-lisp
+(use-package eglot-fsharp
+  :after fsharp-mode
+  :config
+  (setq eglot-fsharp-server-install-dir nil)
+
+  (defun eglot-fsharp--latest-version ()
+    ;; Overriden to return the installed version
+    (eglot-fsharp--installed-version))
+  (defun eglot-fsharp--maybe-install (&optional version)
+    ;; Overriden to prevent installation
+    nil))
+#+end_src

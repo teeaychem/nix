@@ -1,5 +1,5 @@
 -*- mode: org -*-
-#+startup: show2levels
+#+startup: showall
 #+PROPERTY: header-args :comment no :lexical t :results silent
 
 
@@ -14,6 +14,7 @@
   (mac-right-option-modifier 'left)
   (mac-control-modifier 'control)
   (mac-pass-command-to-system t)
+
   (menu-bar-mode t)
   (setq-default trash-directory "~/.Trash/emacs"))
 #+end_src
