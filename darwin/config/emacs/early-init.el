@@ -65,3 +65,6 @@
 
 (advice-add 'display-startup-echo-area-message :override #'ignore)
 
+;; emacs-lsp-booster
+;; https://github.com/blahgeek/emacs-lsp-booster
+(setenv "LSP_USE_PLISTS" "true")
