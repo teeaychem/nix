@@ -4,6 +4,7 @@
   inputs = {
     # nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
@@ -21,24 +22,26 @@
   };
 
   outputs =
-    inputs@{
+    {
       self,
       nixpkgs,
-      nix-darwin,
-      emacs-overlay,
+      nixpkgs-unstable,
       home-manager,
       ...
-    }:
+    }@inputs:
 
     let
+      inherit (self) outputs;
+
       pkg-config = {
         allowUnfree = true;
         allowBroken = true;
         allowInsecure = false;
         allowUnsupportedSystem = false;
       };
+
       common-overlays = [
-        (import emacs-overlay)
+        (import inputs.emacs-overlay)
       ]
       ++ (
         let
@@ -84,6 +87,7 @@
             typos
             zoxide
           ];
+
           environment.shells = with pkgs; [
             bash
             fish
@@ -148,17 +152,22 @@
             };
           };
         };
+
     in
+
     {
 
-      darwinConfigurations.mbp = nix-darwin.lib.darwinSystem {
+      darwinConfigurations.mbp = inputs.nix-darwin.lib.darwinSystem {
         pkgs = darwin-pkgs;
         modules = [ darwin-config ];
       };
 
-      homeConfigurations.sparkes = home-manager.lib.homeManagerConfiguration {
-        pkgs = darwin-pkgs;
-        modules = [ ./darwin ];
+      homeConfigurations = {
+        sparkes = inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = darwin-pkgs;
+          extraSpecialArgs = { inherit inputs outputs; };
+          modules = [ ./darwin ];
+        };
       };
 
     };

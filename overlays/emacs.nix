@@ -8,20 +8,22 @@
 # https://github.com/d12frosted/homebrew-emacs-plus
 
 self: super: rec {
-  emacs-derived = super.emacs-unstable.override {
-  };
-  emacs-derivedBase =
+  emacs-derived = super.emacs-unstable.override { };
+  emacs-derived-plus =
     if super.stdenv.isDarwin then
       emacs-derived.overrideAttrs (old: {
         patches = [
           (super.fetchpatch {
             url = "https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/refs/heads/master/patches/emacs-28/fix-window-role.patch";
+            hash = "sha256-+z/KfsBm1lvZTZNiMbxzXQGRTjkCFO4QPlEK35upjsE=";
           })
           (super.fetchpatch {
             url = "https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/master/patches/emacs-30/round-undecorated-frame.patch";
+            hash = "sha256-uYIxNTyfbprx5mCqMNFVrBcLeo+8e21qmBE3lpcnd+4=";
           })
           (super.fetchpatch {
             url = "https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/refs/heads/master/patches/emacs-30/system-appearance.patch";
+            hash = "sha256-3QLq91AQ6E921/W9nfDjdOUWR8YVsqBAT/W9c1woqAw=";
           })
         ];
       })
