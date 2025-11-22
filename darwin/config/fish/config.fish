@@ -107,6 +107,12 @@ source "$HOME/.cargo/env.fish"
 # fish_add_path "$VCPKG_ROOT"
 # set -gx VCPKG_FORCE_SYSTEM_BINARIES 1
 
+# etc
+
+## https://fishshell.com/docs/current/faq.html#faq-history
+function last_history_item; echo $history[1]; end
+abbr -a !! --position anywhere --function last_history_item
+
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
