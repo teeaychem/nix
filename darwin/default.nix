@@ -1,4 +1,9 @@
-{ inputs, outputs, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  pkgs,
+  ...
+}:
 {
 
   home = {
@@ -14,17 +19,26 @@
     packages = with pkgs; [
       cmake
       emacs-derived-plus
-      emacs-lsp-booster
       gnugrep
+      qemu
 
       cvc5
       z3
 
+      rustup
+      python3
+
       llvmPackages_21.clang-tools
+      comrak # GF(Markdown)
       gersemi
+      nil
       ruff
-      rust-analyzer
+      # rust-analyzer
       taplo
+
+      feishin
+      keka
+      keepassxc
     ];
   };
 

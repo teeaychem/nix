@@ -78,6 +78,7 @@
             fzf
             hunspell
             imagemagick
+            zellij
             neovim
             nixfmt-rfc-style
             pkgconf
@@ -86,6 +87,8 @@
             tmux
             typos
             zoxide
+
+            nerd-fonts."m+"
           ];
 
           environment.shells = with pkgs; [
@@ -133,10 +136,8 @@
             taps = [ "d12frosted/emacs-plus" ];
             brews = [ "emacs-plus@30" ];
             casks = [
-              "feishin"
               "raycast"
               "rectangle"
-              "syntax-highlight"
               "hammerspoon"
             ];
             caskArgs.no_quarantine = true;
