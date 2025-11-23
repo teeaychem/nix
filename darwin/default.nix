@@ -50,6 +50,7 @@
       enable = true;
       enableFishIntegration = true;
     };
+
   };
 
   xdg.enable = true;

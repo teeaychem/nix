@@ -19,6 +19,11 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -26,12 +31,15 @@
       self,
       nixpkgs,
       nixpkgs-unstable,
+      nix-darwin,
       home-manager,
       ...
     }@inputs:
 
     let
       inherit (self) outputs;
+
+      system = "aarch64-darwin";
 
       pkg-config = {
         allowUnfree = true;
@@ -54,6 +62,7 @@
           )
         )
       );
+
       linux-pkgs = import nixpkgs {
         system = "aarch64-linux";
         config = pkg-config;
@@ -92,20 +101,17 @@
             nerd-fonts."m+"
           ];
 
-          # environment.shells = with pkgs; [
-          #   bash
-          #   fish
-          #   zsh
-          # ];
+          environment.shells = with pkgs; [
+            bash
+            fish
+            zsh
+          ];
 
-          nix = {
-            enable = false;
-            settings.experimental-features = "nix-command flakes";
-          };
+          nix.settings.experimental-features = "nix-command flakes";
 
           system = {
             configurationRevision = self.rev or self.dirtyRev or null;
-            stateVersion = 6;
+            # stateVersion = 6;
             primaryUser = "sparkes";
           };
 
@@ -150,7 +156,7 @@
             knownUsers = [ config.system.primaryUser ];
             users.${config.system.primaryUser} = {
               uid = 501;
-              # shell = pkgs.fish;
+              shell = pkgs.fish;
             };
           };
         };
@@ -159,9 +165,66 @@
 
     {
 
-      darwinConfigurations.mbp = inputs.nix-darwin.lib.darwinSystem {
+      # nix-darwin module outputs
+      darwinModules = {
+        # Some base configuration
+        base =
+          {
+            config,
+            pkgs,
+            lib,
+            ...
+          }:
+          {
+            # Required for nix-darwin to work
+            system.stateVersion = 1;
+
+            # users.users.${username} = {
+            #   name = username;
+            #   # See the reference docs for more on user config:
+            #   # https://nix-darwin.github.io/nix-darwin/manual/#opt-users.users
+            # };
+
+            # Other configuration parameters
+            # See here: https://nix-darwin.github.io/nix-darwin/manual
+          };
+
+        # Nix configuration
+        nixConfig =
+          {
+            config,
+            pkgs,
+            lib,
+            ...
+          }:
+          {
+            # Let Determinate Nix handle your Nix configuration
+            nix.enable = false;
+
+            # Custom Determinate Nix settings written to /etc/nix/nix.custom.conf
+            determinate-nix.customSettings = {
+              # Enables parallel evaluation (remove this setting or set the value to 1 to disable)
+              eval-cores = 0;
+              extra-experimental-features = [
+                "build-time-fetch-tree" # Enables build-time flake inputs
+                "parallel-eval" # Enables parallel evaluation
+              ];
+              # Other settings
+            };
+          };
+
+        # Add other module outputs here
+      };
+
+      darwinConfigurations."mbp" = nix-darwin.lib.darwinSystem {
+        inherit system;
         pkgs = darwin-pkgs;
-        modules = [ darwin-config ];
+        modules = [
+          inputs.determinate.darwinModules.default
+          self.darwinModules.base
+          self.darwinModules.nixConfig
+          darwin-config
+        ];
       };
 
       homeConfigurations = {

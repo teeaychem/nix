@@ -9,11 +9,14 @@
 
   programs.git = {
     enable = true;
-    settings = {
-      user = {
-        name = "teeaychem";
-        email = "ben@sparkes.uk.net";
+    extraConfig = {
+      user.name = "teeaychem";
+      user.email = "ben@sparkes.uk.net";
+
+      alias = {
+        l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human";
       };
+
       core = {
         pager = "delta";
       };
@@ -43,10 +46,7 @@
         short = false;
         branch = true;
       };
-
-      alias = {
-        l = "log --graph --decorate --pretty=format:'%C(auto)%h %Cblue%ad %Cred%aN %C(auto)%d %n    %s' --date=human";
-      };
     };
+
   };
 }
