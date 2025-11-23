@@ -1093,6 +1093,26 @@ These buffers can be seen by using space
 
 #+begin_src emacs-lisp :results silent :noweb yes
 (use-package consult
+  :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
+         (:map consult-search-prefix-map
+               ("d" . consult-find)                  ;; Alternative: consult-fd
+               ("c" . consult-locate)
+               ("G" . consult-grep)
+               ("g" . consult-git-grep)
+               ("r" . consult-ripgrep)
+               ("s" . consult-line)
+               ("L" . consult-line-multi)
+               ("k" . consult-keep-lines)
+               ("u" . consult-focus-lines)))
+  :bind(  (:prefix-map consult-goto-prefix-map :prefix "C-c g")
+          (:map consult-goto-prefix-map
+                ("e" . consult-compile-error)
+                ("g" . consult-goto-line)             ;; orig. goto-line
+                ("o" . consult-outline)               ;; Alternative: consult-org-heading
+                ("m" . consult-mark)
+                ("k" . consult-global-mark)
+                ("i" . consult-imenu)
+                ("I" . consult-imenu-multi)))
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c c M" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -1114,38 +1134,16 @@ These buffers can be seen by using space
          ;; Other custom bindings
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; Isearch integration
-         ("M-s e" . consult-isearch-history))
-  :bind (:map isearch-mode-map
-              ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-              ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-              ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-              ("M-s L" . consult-line-multi))            ;; needed by consult-line to detect isearch)
-  ;; Minibuffer history
-  :bind (:map minibuffer-local-map
-              ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-              ("M-r" . consult-history))                 ;; orig. previous-matching-history-element
-  :bind (;; M-s bindings in `search-map'
-         (:prefix-map consult-search-prefix-map :prefix "C-c s")
-         (:map consult-search-prefix-map
-               ("d" . consult-find)                  ;; Alternative: consult-fd
-               ("c" . consult-locate)
-               ("G" . consult-grep)
-               ("g" . consult-git-grep)
-               ("r" . consult-ripgrep)
-               ("s" . consult-line)
-               ("L" . consult-line-multi)
-               ("k" . consult-keep-lines)
-               ("u" . consult-focus-lines)))
-  :bind (;; M-g bindings in `goto-map'
-         (:prefix-map consult-goto-prefix-map :prefix "C-c g")
-         (:map consult-goto-prefix-map
-               ("e" . consult-compile-error)
-               ("g" . consult-goto-line)             ;; orig. goto-line
-               ("o" . consult-outline)               ;; Alternative: consult-org-heading
-               ("m" . consult-mark)
-               ("k" . consult-global-mark)
-               ("i" . consult-imenu)
-               ("I" . consult-imenu-multi)))
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                 ;; orig. previous-matching-history-element
   ;; Enable automatic preview at point in the *Completions* buffer. This is relevant when you use the default completion UI.
   :hook
   (completion-list-mode . consult-preview-at-point-mode)
