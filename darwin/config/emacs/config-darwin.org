@@ -24,7 +24,7 @@
   :if (memq system-type '(darwin))
   :init
   (set-face-attribute 'default nil
-                      :family "M+1Code Nerd Font Mono"; "Maple Mono NF" "JuliaMono"
+                      :family "M PLUS 1 Code"; "Maple Mono NF" "JuliaMono"
                       :height 150)
 
   :custom
