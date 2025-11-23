@@ -11,7 +11,7 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -74,6 +74,7 @@
           environment.systemPackages = with pkgs; [
             bat
             coreutils
+            delta
             fd
             fzf
             hunspell
@@ -91,11 +92,11 @@
             nerd-fonts."m+"
           ];
 
-          environment.shells = with pkgs; [
-            bash
-            fish
-            zsh
-          ];
+          # environment.shells = with pkgs; [
+          #   bash
+          #   fish
+          #   zsh
+          # ];
 
           nix = {
             enable = false;
@@ -149,7 +150,7 @@
             knownUsers = [ config.system.primaryUser ];
             users.${config.system.primaryUser} = {
               uid = 501;
-              shell = pkgs.fish;
+              # shell = pkgs.fish;
             };
           };
         };
