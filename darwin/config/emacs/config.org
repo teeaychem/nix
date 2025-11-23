@@ -725,11 +725,18 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 ** ws-butler
 
 #+begin_src emacs-lisp
-(use-package ws-butler
-  :custom
-  (ws-butler-keep-whitespace-before-point nil)
-  :hook
-  ((prog-mode . ws-butler-mode)))
+;; (use-package ws-butler
+;;   :custom
+;;   (ws-butler-keep-whitespace-before-point nil)
+;;   :hook
+;;   ((prog-mode . ws-butler-mode)))
+
+(use-package whitespace
+  :config
+  ;; (setq-default show-trailing-whitespace t)
+  (setq whitespace-style '(face tabs trailing))
+  (add-hook 'prog-mode-hook 'whitespace-mode)
+  (add-hook 'before-save-hook 'whitespace-cleanup))
 #+end_src
 
 * vc
@@ -1297,7 +1304,7 @@ https://github.com/Qkessler/consult-project-extra
   (setq vertico-scroll-margin 0) ;; Different scroll margin
   (setq vertico-count 16) ;; Show more candidates
   (setq vertico-resize t) ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-cycle nil) 
+  (setq vertico-cycle nil)
   (setq vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha)))))
 #+end_src
 ** embark
