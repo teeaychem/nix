@@ -129,3 +129,7 @@ fzf --fish | source
 zoxide init fish | source
 
 direnv hook fish | source
+
+if command -q nix-your-shell
+  nix-your-shell fish | source
+end

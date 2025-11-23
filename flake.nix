@@ -91,6 +91,7 @@
             zellij
             neovim
             nixfmt-rfc-style
+            nix-your-shell
             pkgconf
             ripgrep
             starship
