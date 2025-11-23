@@ -118,9 +118,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (("C-<wheel-up>" . ignore)
    ("C-<wheel-down>" . ignore)
    ("<mouse-2>" . ignore) ;; figure out what to do with middle button…
-   ("<mouse-3>" . context-menu-open)
-
    ("C-z" . ignore)
+
+   ("<mouse-3>" . context-menu-open)
    ("C-<tab>" . completion-at-point)
    ("C-<backspace>" . backward-delete-word)
    ("C-k" . forward-delete-line)
@@ -129,14 +129,32 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
    ("M-DEL" . backward-delete-word)
 
-   ("RET" . newline-and-indent)
+   ("RET" . newline-and-indent)))
 
-   ("C-c w <left>" . windmove-left)
-   ("C-c w <right>" . windmove-right)
-   ("C-c w <up>" . windmove-up)
-   ("C-c w <down>" . windmove-down)
-   ))
+(use-package emacs
+  :bind (:prefix-map window-prefix-map
+                     :prefix "C-c w")
+  (:map window-prefix-map
+        ("<left>"  . windmove-left)
+        ("<right>" . windmove-right)
+        ("<up>  "  . windmove-up)
+        ("<down>"  . windmove-down)
+        ("l"       . #'display-line-numbers-mode)))
 #+end_src
+
+** bookmarks
+#+begin_src emacs-lisp
+(use-package emacs
+  :bind (:prefix-map bookmark-prefix-map
+                     :prefix "C-c b")
+  (:map bookmark-prefix-map
+        ("c" . consult-bookmark)
+        ("d" . bookmark-delete)
+        ("e" . edit-bookmarks)
+        ("j" . bookmark-jump)
+        ("s" . bookmark-set-no-overwrite)
+        ("S" . bookmark-set)))
+  #+end_src
 
 * visual
 ** display
@@ -367,7 +385,7 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
 
   :bind (:map flymake-mode-map
-              :prefix "C-c e"
+              :prefix "C-c g e"
               :prefix-map flymake-mode-prefix-map)
 
   :bind (:repeat-map flymake-mode-prefix-map
@@ -1013,19 +1031,21 @@ https://github.com/radian-software/apheleia/issues/278
 
 #+begin_src emacs-lisp
 (use-package cape
-  :bind (("C-c p p" . completion-at-point) ;; capf
-         ("C-c p t" . complete-tag)        ;; etags
-         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
-         ("C-c p h" . cape-history)
-         ("C-c p f" . cape-file)
-         ("C-c p k" . cape-keyword)
-         ("C-c p s" . cape-elisp-symbol)
-         ("C-c p e" . cape-elisp-block)
-         ("C-c p a" . cape-abbrev)
-         ("C-c p l" . cape-line)
-         ("C-c p w" . cape-dict)
-         ("C-c p :" . cape-emoji)
-         ("C-c p r" . cape-rfc1345))
+  :bind (:prefix-map cape-prefix-map :prefix "C-c p")
+  (:map cape-prefix-map
+        ("p" . completion-at-point) ;; capf
+        ("t" . complete-tag)        ;; etags
+        ("d" . cape-dabbrev)        ;; or dabbrev-completion
+        ("h" . cape-history)
+        ("f" . cape-file)
+        ("k" . cape-keyword)
+        ("s" . cape-elisp-symbol)
+        ("e" . cape-elisp-block)
+        ("a" . cape-abbrev)
+        ("l" . cape-line)
+        ("w" . cape-dict)
+        (":" . cape-emoji)
+        ("r" . cape-rfc1345))
   :init
   ;; Add to the global default value of `completion-at-point-functions' which is used by `completion-at-point'.
   ;; The order of the functions matters, the first function returning a result wins.
@@ -1067,7 +1087,7 @@ These buffers can be seen by using space
 #+begin_src emacs-lisp :results silent :noweb yes
 (use-package consult
   :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c c m" . consult-mode-command)
+         ("C-c c M" . consult-mode-command)
          ("C-c h" . consult-history)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
@@ -1078,7 +1098,7 @@ These buffers can be seen by using space
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ;; ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
          ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
          ;; Custom M-# bindings for fast register access
          ("C-c r l" . consult-register-load)
@@ -1086,25 +1106,6 @@ These buffers can be seen by using space
          ("C-c r x" . consult-register)
          ;; Other custom bindings
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; M-g bindings in `goto-map'
-         ("C-c g e" . consult-compile-error)
-         ("C-c e c" . consult-flymake)
-         ("C-c g g" . consult-goto-line)             ;; orig. goto-line
-         ("C-c g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("C-c g m" . consult-mark)
-         ("C-c g k" . consult-global-mark)
-         ("C-c g i" . consult-imenu)
-         ("C-c g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("C-c s d" . consult-find)                  ;; Alternative: consult-fd
-         ("C-c s c" . consult-locate)
-         ("C-c s G" . consult-grep)
-         ("C-c s g" . consult-git-grep)
-         ("C-c s r" . consult-ripgrep)
-         ("C-c s s" . consult-line)
-         ("C-c s L" . consult-line-multi)
-         ("C-c s k" . consult-keep-lines)
-         ("C-c s u" . consult-focus-lines)
          ;; Isearch integration
          ("M-s e" . consult-isearch-history)
          :map isearch-mode-map
@@ -1117,6 +1118,28 @@ These buffers can be seen by using space
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
          )
+  (;; M-s bindings in `search-map'
+   (:prefix-map consult-search-prefix-map :prefix "C-c s")
+   (:map consult-search-prefix-map
+         ("d" . consult-find)                  ;; Alternative: consult-fd
+         ("c" . consult-locate)
+         ("G" . consult-grep)
+         ("g" . consult-git-grep)
+         ("r" . consult-ripgrep)
+         ("s" . consult-line)
+         ("L" . consult-line-multi)
+         ("k" . consult-keep-lines)
+         ("u" . consult-focus-lines)))
+  (;; M-g bindings in `goto-map'
+   (:prefix-map consult-goto-prefix-map :prefix "C-c g")
+   (:map consult-goto-prefix-map
+         ("e" . consult-compile-error)
+         ("g" . consult-goto-line)             ;; orig. goto-line
+         ("o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("m" . consult-mark)
+         ("k" . consult-global-mark)
+         ("i" . consult-imenu)
+         ("I" . consult-imenu-multi)))
   ;; Enable automatic preview at point in the *Completions* buffer. This is relevant when you use the default completion UI.
   :hook
   (completion-list-mode . consult-preview-at-point-mode)
