@@ -137,21 +137,6 @@ latex-mode
 (pr "\\textsf{pr}")
 (eu "\\mathbb{E}\\mathcal{U}")
 
-c++-mode
-
-(dr "->")
-(cout "std::cout << " p " << "\\n";")
-(amain "
-#include <vector>
-
-using namespace std;
-
-int main(int argc, char **argv) {"
-p
-"
-return 0;
-}")
-
 org-mode
 
 (caption "#+caption: ")
@@ -173,3 +158,28 @@ org-mode
 (racket "#+begin_src racket" n r n "#+end_src" :post (org-edit-src-code))
 (inlsrc "src_" p "{" q "}")
 (title "#+title: " p n "#+author: sparkes" n "#+language: en")
+
+
+c++-mode
+
+(cout "std::cout << " p " << "\\n";")
+(amain "
+using namespace std;
+
+int main(int argc, char **argv) {"
+p
+"
+return 0;
+}")
+
+
+c-mode
+
+(dereference "->")
+(reference "&")
+
+;; https://gligan.net/emacs-config
+(guard "#ifndef " (r (upcase (file-name-base (buffer-name))) header-name) "_H" n
+       "#define " header-name "_H" n n
+       q n n
+       "#endif  /* " header-name "_H */" n)
