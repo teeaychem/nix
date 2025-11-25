@@ -220,7 +220,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook #'context-menu-mode)
 (add-hook 'prog-mode-hook #'electric-pair-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 #+end_src
 ** dired
 #+begin_src emacs-lisp
@@ -725,18 +724,18 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 ** ws-butler
 
 #+begin_src emacs-lisp
-;; (use-package ws-butler
-;;   :custom
-;;   (ws-butler-keep-whitespace-before-point nil)
-;;   :hook
-;;   ((prog-mode . ws-butler-mode)))
+(use-package ws-butler
+  :custom
+  (ws-butler-keep-whitespace-before-point nil)
+  :hook
+  ((prog-mode . ws-butler-mode)))
 
-(use-package whitespace
-  :config
-  ;; (setq-default show-trailing-whitespace t)
-  (setq whitespace-style '(face tabs trailing))
-  (add-hook 'prog-mode-hook 'whitespace-mode)
-  (add-hook 'before-save-hook 'whitespace-cleanup))
+;; (use-package whitespace
+;;   :config
+;;   ;; (setq-default show-trailing-whitespace t)
+;;   (setq whitespace-style '(face tabs trailing))
+;;   (add-hook 'prog-mode-hook 'whitespace-mode)
+;;   (add-hook 'before-save-hook 'whitespace-cleanup))
 #+end_src
 
 * vc
@@ -806,6 +805,10 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :mode "\\.lp\\'"
   :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
+#+end_src
+** boogie & friends
+#+begin_src emacs-lisp
+(use-package boogie-friends)
 #+end_src
 ** C/pp
 
@@ -1344,6 +1347,7 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (use-package eglot
+  :pin manual
   :custom
   ;; (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   (eglot-report-progress nil)
@@ -1407,6 +1411,7 @@ for rust dev
 
 #+begin_src emacs-lisp
 (use-package eglot-x
+  :disabled
   :if (memq system-type '(darwin))
   :vc (eglot-x :url "https://github.com/nemethf/eglot-x"
                :rev :newest)
