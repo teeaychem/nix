@@ -21,10 +21,6 @@ set -x XDG_VIDEOS_DIR "$HOME/Videos"
 
 if test (uname) = Darwin
     eval "$(/opt/homebrew/bin/brew shellenv)"
-
-    if not brew_ok
-        echo "brew not ok"
-    end
 end
 
 # bison
