@@ -18,4 +18,6 @@ https://dev.to/synecdokey/nix-on-macos-2oj3
 
 ## hek
 
-https://github.com/nix-darwin/nix-darwin/issues/871
+- https://github.com/nix-darwin/nix-darwin/issues/871
+- https://github.com/nix-community/home-manager/issues/8174
+  `rm -r ~/Applications/Home\ Manager\ Apps/` to resolve `error: permission denied when trying to update apps, aborting activation`

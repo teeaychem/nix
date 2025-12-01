@@ -9,7 +9,7 @@
 
   programs.git = {
     enable = true;
-    extraConfig = {
+    settings = {
       user.name = "teeaychem";
       user.email = "ben@sparkes.uk.net";
 

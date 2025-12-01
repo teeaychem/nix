@@ -7,7 +7,7 @@
 {
 
   home = {
-    stateVersion = "25.05";
+    stateVersion = "25.11";
     username = "sparkes";
     homeDirectory = "/Users/sparkes";
 
@@ -25,10 +25,9 @@
       cvc5
       z3
 
-      rustup
       python3
 
-      llvmPackages_21.clang-tools
+      # llvmPackages_21.clang-tools
       comrak # GF(Markdown)
       gersemi
       nil
