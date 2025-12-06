@@ -20,6 +20,7 @@
       cmake
       emacs-derived-plus
       gnugrep
+      lazygit
       qemu
 
       cvc5
@@ -30,7 +31,10 @@
       # llvmPackages_21.clang-tools
       comrak # GF(Markdown)
       gersemi
+      luajitPackages.luarocks
       nil
+      prettier
+      pyrefly
       ruff
       # rust-analyzer
       taplo
