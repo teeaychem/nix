@@ -19,11 +19,6 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    determinate = {
-      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -80,82 +75,95 @@
         { config, pkgs, ... }:
         {
           # $ nix-env -qaP
-          environment.systemPackages = with pkgs; [
-            bat
-            coreutils
-            delta
-            fd
-            fzf
-            hunspell
-            imagemagick
-            zellij
-            neovim
-            nixfmt-rfc-style
-            nix-your-shell
-            pkg-configUpstream # ?pkg-config fails
-            ripgrep
-            starship
-            tmux
-            tree-sitter
-            tree-sitter-grammars.tree-sitter-bash
-            tree-sitter-grammars.tree-sitter-c
-            tree-sitter-grammars.tree-sitter-cpp
-            tree-sitter-grammars.tree-sitter-elisp
-            tree-sitter-grammars.tree-sitter-fish
-            tree-sitter-grammars.tree-sitter-haskell
-            tree-sitter-grammars.tree-sitter-javascript
-            tree-sitter-grammars.tree-sitter-json
-            tree-sitter-grammars.tree-sitter-latex
-            tree-sitter-grammars.tree-sitter-lua
-            tree-sitter-grammars.tree-sitter-nix
-            tree-sitter-grammars.tree-sitter-ocaml
-            tree-sitter-grammars.tree-sitter-python
-            tree-sitter-grammars.tree-sitter-rust
-            tree-sitter-grammars.tree-sitter-scheme
-            tree-sitter-grammars.tree-sitter-toml
-            tree-sitter-grammars.tree-sitter-vim
-            typos
-            zoxide
+          nix.enable = false;
 
-            nerd-fonts."m+"
-          ];
+          environment = {
+            shells = with pkgs; [
+              bash
+              fish
+              zsh
+            ];
 
-          environment.shells = with pkgs; [
-            bash
-            fish
-            zsh
+            systemPackages = with pkgs; [
+              bat
+              coreutils
+              delta
+              fd
+              fzf
+              hunspell
+              imagemagick
+              neovim
+              nix-your-shell
+              nixfmt-rfc-style
+              pkg-configUpstream # ?pkg-config fails
+              ripgrep
+              starship
+              tmux
+              typos
+              zellij
+              zoxide
+
+              tree-sitter
+              tree-sitter-grammars.tree-sitter-bash
+              tree-sitter-grammars.tree-sitter-c
+              tree-sitter-grammars.tree-sitter-cpp
+              tree-sitter-grammars.tree-sitter-elisp
+              tree-sitter-grammars.tree-sitter-fish
+              tree-sitter-grammars.tree-sitter-haskell
+              tree-sitter-grammars.tree-sitter-javascript
+              tree-sitter-grammars.tree-sitter-json
+              tree-sitter-grammars.tree-sitter-latex
+              tree-sitter-grammars.tree-sitter-lua
+              tree-sitter-grammars.tree-sitter-nix
+              tree-sitter-grammars.tree-sitter-ocaml
+              tree-sitter-grammars.tree-sitter-python
+              tree-sitter-grammars.tree-sitter-rust
+              tree-sitter-grammars.tree-sitter-scheme
+              tree-sitter-grammars.tree-sitter-toml
+              tree-sitter-grammars.tree-sitter-vim
+
+            ];
+          };
+
+          fonts.packages = [
+            pkgs.nerd-fonts."m+"
           ];
 
           nix.settings.experimental-features = "nix-command flakes";
 
           system = {
             configurationRevision = self.rev or self.dirtyRev or null;
-            # stateVersion = 6;
+            stateVersion = 6;
             primaryUser = "sparkes";
+
+            defaults = {
+              dock.autohide = true;
+              NSGlobalDomain = {
+                AppleFontSmoothing = 0;
+                AppleICUForce24HourTime = true;
+                AppleShowAllExtensions = true;
+                AppleShowAllFiles = true;
+                AppleShowScrollBars = "Always";
+                NSAutomaticCapitalizationEnabled = false;
+                NSAutomaticDashSubstitutionEnabled = false;
+                NSAutomaticInlinePredictionEnabled = false;
+                NSAutomaticPeriodSubstitutionEnabled = false;
+                NSAutomaticQuoteSubstitutionEnabled = false;
+                NSAutomaticSpellingCorrectionEnabled = false;
+                NSAutomaticWindowAnimationsEnabled = false;
+                NSDocumentSaveNewDocumentsToCloud = false;
+                NSNavPanelExpandedStateForSaveMode = true;
+                NSNavPanelExpandedStateForSaveMode2 = true;
+              };
+            };
+
+            keyboard = {
+              enableKeyMapping = true;
+              remapCapsLockToControl = true;
+            };
           };
 
           nixpkgs.hostPlatform = "aarch64-darwin";
-
-          system.defaults = {
-            dock.autohide = true;
-            NSGlobalDomain = {
-              AppleFontSmoothing = 0;
-              AppleICUForce24HourTime = true;
-              AppleShowAllExtensions = true;
-              AppleShowAllFiles = true;
-              AppleShowScrollBars = "Always";
-              NSAutomaticCapitalizationEnabled = false;
-              NSAutomaticDashSubstitutionEnabled = false;
-              NSAutomaticInlinePredictionEnabled = false;
-              NSAutomaticPeriodSubstitutionEnabled = false;
-              NSAutomaticQuoteSubstitutionEnabled = false;
-              NSAutomaticSpellingCorrectionEnabled = false;
-              NSAutomaticWindowAnimationsEnabled = false;
-              NSDocumentSaveNewDocumentsToCloud = false;
-              NSNavPanelExpandedStateForSaveMode = true;
-              NSNavPanelExpandedStateForSaveMode2 = true;
-            };
-          };
 
           homebrew = {
             enable = true;
@@ -163,17 +171,15 @@
             # taps = [ "d12frosted/emacs-plus" ];
             brews = [
               # "emacs-plus@30"
-              "luarocks"
-              "prettier"
-              "pyrefly"
             ];
             casks = [
               "doll"
               "hammerspoon"
               "raycast"
               "rectangle"
-              "vlc"
+              "skim"
               "xld"
+              "vlc"
             ];
             caskArgs.no_quarantine = true;
           };
@@ -193,66 +199,10 @@
 
     {
 
-      # nix-darwin module outputs
-      darwinModules = {
-        # Some base configuration
-        base =
-          {
-            config,
-            pkgs,
-            lib,
-            ...
-          }:
-          {
-            # Required for nix-darwin to work
-            system.stateVersion = 1;
-
-            # users.users.${username} = {
-            #   name = username;
-            #   # See the reference docs for more on user config:
-            #   # https://nix-darwin.github.io/nix-darwin/manual/#opt-users.users
-            # };
-
-            # Other configuration parameters
-            # See here: https://nix-darwin.github.io/nix-darwin/manual
-          };
-
-        # Nix configuration
-        nixConfig =
-          {
-            config,
-            pkgs,
-            lib,
-            ...
-          }:
-          {
-            # Let Determinate Nix handle your Nix configuration
-            nix.enable = false;
-
-            # Custom Determinate Nix settings written to /etc/nix/nix.custom.conf
-            determinate-nix.customSettings = {
-              # Enables parallel evaluation (remove this setting or set the value to 1 to disable)
-              eval-cores = 0;
-              extra-experimental-features = [
-                "build-time-fetch-tree" # Enables build-time flake inputs
-                "parallel-eval" # Enables parallel evaluation
-              ];
-              # Other settings
-            };
-          };
-
-        # Add other module outputs here
-      };
-
       darwinConfigurations."mbp" = nix-darwin.lib.darwinSystem {
         inherit system;
         pkgs = darwin-pkgs;
-        modules = [
-          inputs.determinate.darwinModules.default
-          self.darwinModules.base
-          self.darwinModules.nixConfig
-          darwin-config
-        ];
+        modules = [ darwin-config ];
       };
 
       homeConfigurations = {
