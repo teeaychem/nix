@@ -54,6 +54,7 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
   (sentence-end-double-space nil)
   (enable-recursive-minibuffers t)
   (tab-always-indent t)
+  (custom-buffer-indent 4)
 
   (auto-save-interval 200)
 
@@ -129,7 +130,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
    ("M-DEL" . backward-delete-word)
 
-   ("RET" . newline-and-indent)))
+   ("RET" . newline)))
 
 (use-package emacs
   :bind (:prefix-map window-prefix-map
@@ -340,8 +341,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 ** ispell
 
-maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
-
 #+begin_src emacs-lisp
 (use-package ispell
   :after exec-path-from-shell
@@ -382,7 +381,9 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
     (interactive (list 1 t))
     (flymake-goto-prev-error N '(error) INTERACTIVE))
 
-
+  :config
+  (setq flymake-diagnostic-format-alist
+        '((t . (origin code message))))
   :bind (:map flymake-mode-map
               :prefix "C-c g e"
               :prefix-map flymake-mode-prefix-map)
@@ -602,6 +603,12 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 (setq xref-backend-functions (remq 'etags--xref-backend xref-backend-functions))
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
 (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+#+end_src
+** editoronfig
+#+begin_src emacs-lisp
+(use-package editorconfig
+  :config
+  (editorconfig-mode 1))
 #+end_src
 ** envrc
 #+begin_src emacs-lisp
@@ -922,7 +929,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   )
 
 (use-package ocaml-eglot
-  :ensure t
   :after tuareg
   :hook
   (tuareg-mode . ocaml-eglot)
@@ -948,7 +954,7 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
 
   (defun python-local-setup ()
     (message "Performing local python setup")
-    (setq-local python-shell-interpreter (pet-executable-find "python"))
+    (setq-local python-shell-interpreter (pet-executable-find "python3"))
     (setq-local python-shell-virtualenv-root (pet-virtualenv-root))
     (pet-eglot-setup))
   (add-hook 'python-base-mode-hook 'python-local-setup))
