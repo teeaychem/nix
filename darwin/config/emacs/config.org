@@ -920,6 +920,13 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   (setq utop-command "opam exec -- utop -emacs")
   ;; (setq utop-command "opam exec -- dune utop . -- -emacs")
   )
+
+(use-package ocaml-eglot
+  :ensure t
+  :after tuareg
+  :hook
+  (tuareg-mode . ocaml-eglot)
+  (ocaml-eglot . eglot-ensure))
 #+end_src
 ** python
 
@@ -1448,7 +1455,7 @@ for rust dev
 ;;                                          :useLibraryCodeForTypes :json-false
 ;;                                          :verboseOutput :json-false))))))
 #+end_src
-** lsp-mode
+** COMMENT lsp-mode
 *** lsp-mode
 #+begin_src emacs-lisp
 (use-package lsp-mode
