@@ -7,6 +7,7 @@
 #+begin_src emacs-lisp
 (use-package org
   :defer t
+  :pin manual
   :mode ("\\.org" . org-mode)
 
   :custom
