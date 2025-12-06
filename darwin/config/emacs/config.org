@@ -806,10 +806,6 @@ maybe for jit: https://github.com/minad/jinx?tab=readme-ov-file
   :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
-** boogie & friends
-#+begin_src emacs-lisp
-(use-package boogie-friends)
-#+end_src
 ** C/pp
 
 #+begin_src emacs-lisp
