@@ -460,6 +460,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** compile-angel
 #+begin_src emacs-lisp
 (use-package compile-angel
+  :disabled
   :demand t
   :delight compile-angel-on-load-mode
 
@@ -706,9 +707,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package undo-fu
   :init
-  (setq undo-limit (* 64 1024 1024)) ; 64mb.
-  (setq undo-strong-limit (* 96 1024 1024)) ; 96mb.
-  (setq undo-outer-limit (* 96 1024 1024)) ; 96mb.
+  (setq undo-limit (* 8 1024 1024))
+  (setq undo-strong-limit (* 64 1024 1024))
+  (setq undo-outer-limit (* 126 1024 1024))
   :config
   (global-set-key (kbd "C-/") 'undo-fu-only-undo)
   (global-set-key (kbd "C-?") 'undo-fu-only-redo))
@@ -793,16 +794,23 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 #+begin_src emacs-lisp
+(use-package magit-delta
+  :after magit
+  :hook (magit-mode . magit-delta-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package magit-prime
+  :after magit
+  :config
+  (magit-prime-mode t))
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package magit-todos
   :after magit
   :config (magit-todos-mode t))
 #+end_src
-
-#+begin_src emacs-lisp
-(use-package magit-delta
-  :hook (magit-mode . magit-delta-mode))
-#+end_src
-
 * languages
 ** COMMENT ASP
 
@@ -1567,12 +1575,15 @@ for rust dev
 
 * tree sitter
 
+(treesit-library-abi-version)
+
 https://github.com/renzmann/treesit-auto
-https://archive.casouri.cc/note/2023/tree-sitter-in-emacs-29/index.html
 
 #+begin_src emacs-lisp
 (use-package treesit-auto
+  :demand t
   :custom
+  (global-treesit-auto-mode nil)
   (treesit-auto-install 'prompt))
 
 (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
