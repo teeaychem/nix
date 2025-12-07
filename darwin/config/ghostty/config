@@ -16,4 +16,3 @@ font-family = Source Code Pro
 font-feature= -calt
 keybind = global:opt+space=toggle_quick_terminal
 mouse-hide-while-typing = true
-theme = wilmersdorf
