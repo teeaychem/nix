@@ -12,6 +12,7 @@
 
     systemPackages = with pkgs; [
       bat
+      bitwise
       coreutils
       delta
       fd
@@ -30,24 +31,6 @@
       zoxide
 
       tree-sitter
-      tree-sitter-grammars.tree-sitter-bash
-      tree-sitter-grammars.tree-sitter-c
-      tree-sitter-grammars.tree-sitter-cpp
-      tree-sitter-grammars.tree-sitter-elisp
-      tree-sitter-grammars.tree-sitter-fish
-      tree-sitter-grammars.tree-sitter-haskell
-      tree-sitter-grammars.tree-sitter-javascript
-      tree-sitter-grammars.tree-sitter-json
-      tree-sitter-grammars.tree-sitter-latex
-      tree-sitter-grammars.tree-sitter-lua
-      tree-sitter-grammars.tree-sitter-nix
-      tree-sitter-grammars.tree-sitter-ocaml
-      tree-sitter-grammars.tree-sitter-python
-      tree-sitter-grammars.tree-sitter-rust
-      tree-sitter-grammars.tree-sitter-scheme
-      tree-sitter-grammars.tree-sitter-toml
-      tree-sitter-grammars.tree-sitter-vim
-
     ];
   };
 
@@ -94,7 +77,9 @@
   homebrew = {
     enable = true;
     onActivation.autoUpdate = true;
-    # taps = [ "d12frosted/emacs-plus" ];
+    taps = [
+      "d12frosted/emacs-plus"
+    ];
     brews = [
       # "emacs-plus@30"
     ];
