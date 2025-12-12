@@ -1699,8 +1699,7 @@ https://github.com/renzmann/treesit-auto
     text-mode) . tempel-setup-capf)
   (c-ts-base-mode . (lambda ()
                       (tempel-key "C-c c ." dereference c-ts-mode-map)
-                      (tempel-key "C-c c >" reference   c-ts-mode-map)))))
-)
+                      (tempel-key "C-c c >" reference   c-ts-mode-map))))
 #+end_src
 
 * dap
