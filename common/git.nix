@@ -9,6 +9,11 @@
 
   programs.git = {
     enable = true;
+
+    ignores = [
+      ".DS_Store"
+    ];
+
     settings = {
       user.name = "teeaychem";
       user.email = "ben@sparkes.uk.net";
@@ -20,33 +25,39 @@
       core = {
         pager = "delta";
       };
+
       delta = {
         navigate = true;
         dark = true;
       };
+
       init = {
         defaultBranch = "main";
       };
+
       interactive = {
         diffFilter = "delta --color-only";
       };
+
       fetch = {
         prune = true;
       };
+
       filter.lfs = {
         clean = "git-lfs clean -- %f";
         smudge = "git-lfs smudge -- %f";
         process = "git-lfs filter-process";
         required = true;
       };
+
       rerere = {
         enabled = false;
       };
+
       status = {
         short = false;
         branch = true;
       };
     };
-
   };
 }
