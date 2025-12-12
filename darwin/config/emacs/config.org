@@ -1448,6 +1448,7 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-events-buffer-config '(:size 0 :format short))
   ;; (eglot-confirm-server-edits t)
   (jsonrpc-event-hook nil)
+  (eglot-code-action-indications nil)
 
   :config
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
@@ -1463,6 +1464,8 @@ maybe: https://github.com/casouri/eldoc-box
          ("g d" . #'eglot-find-declaration)
          ("g i" . #'eglot-find-implementation)
          ("g t" . #'eglot-find-typeDefinition)
+         ("h c" . #'eglot-call-type-hierarchy)
+         ("h t" . #'eglot-show-type-hierarchy)
          ("i" . #'eglot-inlay-hints-mode)
          ("l" . #'eglot)
          ("r" . #'eglot-rename)
@@ -1473,10 +1476,10 @@ maybe: https://github.com/casouri/eldoc-box
   :custom-face
   (eglot-highlight-symbol-face ((t (:bold nil  :underline (:style dots :position nil)))))
   (eglot-diagnostic-tag-unnecessary-face ((t (:inherit f  :underline (:color "#7cb6cb" :style wave :position nil)))))
+
   :hook
-  ;; ((…-mode) . eglot-ensure)
-  ((eglot-managed-mode . eldoc-promote-flymake))
-  )
+  ;; ;; ((…-mode) . eglot-ensure)
+  ((eglot-managed-mode . eldoc-promote-flymake)))
 #+end_src
 
 #+begin_src emacs-lisp
