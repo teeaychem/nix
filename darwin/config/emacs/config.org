@@ -366,47 +366,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq lazy-count-suffix-format nil)
   (setq search-whitespace-regexp ".*?"))
 #+end_src
-** flymake
-#+begin_src emacs-lisp :result silent
-(use-package flymake
-  :init
-  (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
-  (setq rust-ts-flymake-command '("cargo" "check" "-"))
-
-  (defun flymake-next-error-error (&optional N INTERACTIVE)
-    (interactive (list 1 t))
-    (flymake-goto-next-error N '(error) INTERACTIVE))
-
-  (defun flymake-prev-error-error (&optional N INTERACTIVE)
-    (interactive (list 1 t))
-    (flymake-goto-prev-error N '(error) INTERACTIVE))
-
-  :config
-  (setq flymake-diagnostic-format-alist
-        '((t . (origin code message))))
-  :bind (:map flymake-mode-map
-              :prefix "C-c g e"
-              :prefix-map flymake-mode-prefix-map)
-
-  :bind (:repeat-map flymake-mode-prefix-map
-                     :exit
-                     :continue
-                     ("e" . flymake-goto-next-error)
-                     ("E" . flymake-next-error-error)
-                     ("a" . flymake-goto-prev-error)
-                     ("A" . flymake-prev-error-error))
-  :custom
-  (flymake-margin-indicator-position 'right-margin)
-  (flymake-fringe-indicator-position 'right-fringe)
-  (flymake-wrap-around t))
-#+end_src
-** project
-#+begin_src emacs-lisp
-(use-package project
-  :config
-  (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
-  )
-#+end_src
 ** which-key
 #+begin_src emacs-lisp
 (use-package which-key
@@ -458,7 +417,55 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (catppuccin-italic-variables t))
 #+end_src
 
+* internal straight
+** flymake
+#+begin_src emacs-lisp :result silent
+(use-package flymake
+  :straight t
+  :init
+  (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
+  (setq rust-ts-flymake-command '("cargo" "check" "-"))
+
+  (defun flymake-next-error-error (&optional N INTERACTIVE)
+    (interactive (list 1 t))
+    (flymake-goto-next-error N '(error) INTERACTIVE))
+
+  (defun flymake-prev-error-error (&optional N INTERACTIVE)
+    (interactive (list 1 t))
+    (flymake-goto-prev-error N '(error) INTERACTIVE))
+
+  :config
+  (setq flymake-diagnostic-format-alist
+        '((t . (origin code message))))
+  :bind (:map flymake-mode-map
+              :prefix "C-c g e"
+              :prefix-map flymake-mode-prefix-map)
+
+  :bind (:repeat-map flymake-mode-prefix-map
+                     :exit
+                     :continue
+                     ("e" . flymake-goto-next-error)
+                     ("E" . flymake-next-error-error)
+                     ("a" . flymake-goto-prev-error)
+                     ("A" . flymake-prev-error-error))
+  :custom
+  (flymake-margin-indicator-position 'right-margin)
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-wrap-around t))
+#+end_src
+** project
+
+#+begin_src emacs-lisp
+(use-package project
+  :straight t
+  :config
+  (add-to-list 'project-vc-extra-root-markers "INSTALL_RECEIPT.json") ;; brewed libraries, etc.
+  )
+#+end_src
+
 * external, etc.
+
+
 ** compile-angel
 #+begin_src emacs-lisp
 (use-package compile-angel
