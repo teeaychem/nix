@@ -25,18 +25,37 @@
         ;; ("gnu-devel" . -1)
         ))
 
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+
+
 ;; save custom things to separate file, and also load before doing anything else with packages as it contains a useful list
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file) (load custom-file))
 
-(package-initialize)
+;; (package-initialize)
 
-(when (not (file-directory-p (expand-file-name "elpa" user-emacs-directory)))
-  (package-refresh-contents)
-  (package-install-selected-packages))
+;; (when (not (file-directory-p (expand-file-name "elpa" user-emacs-directory)))
+;;   (package-refresh-contents)
+;;   (package-install-selected-packages))
 
-(setq use-package-verbose nil)
-(setq use-package-always-ensure t)
+;; (setq use-package-verbose nil)
+;; (setq use-package-always-ensure t)
 
 (setq vc-follow-symlinks t)
 

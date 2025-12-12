@@ -240,7 +240,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 #+end_src
 ** eldoc
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package eldoc
   :init
   (global-eldoc-mode)
@@ -441,12 +441,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package doom-themes
+  :straight t
   :config
   (setq ring-bell-function #'doom-themes-visual-bell-fn visible-bell t))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package catppuccin-theme
+  :straight t
   :config
   (load-theme 'catppuccin t)
   (catppuccin-set-color 'text "#ffffff")
@@ -492,6 +494,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package apheleia
+  :straight t
   :init
   (setq-default apheleia-inhibit t)
   (setq-default apheleia-global-mode nil)
@@ -504,7 +507,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
-                                                        "-style={BasedOnStyle: LLVM, ColumnLimit: 0}"
+                                                        "-style={BasedOnStyle: LLVM,
+                                                                 ColumnLimit: 0,
+                                                                 AlignConsecutiveMacros: None}"
                                                         "-assume-filename"
                                                         (or (apheleia-formatters-local-buffer-file-name)
                                                             (apheleia-formatters-mode-extension)
@@ -526,23 +531,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 ** browse kill ring
 #+begin_src emacs-lisp
-(use-package browse-kill-ring)
+(use-package browse-kill-ring
+  :straight t)
 #+end_src
 ** current-window-only
 
 #+begin_src emacs-lisp
-(use-package current-window-only)
+(use-package current-window-only
+    :straight t)
 #+end_src
 ** devdocs
 
 #+begin_src emacs-lisp
 (use-package devdocs
+  :straight t
   :defer t
   :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
 ** diminish
 #+begin_src emacs-lisp
-(use-package delight)
+(use-package delight
+  :straight t)
 #+end_src
 ** dirvish
 #+begin_src emacs-lisp
@@ -557,6 +566,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package dirvish
+  :straight t
   :init
   (dirvish-override-dired-mode)
   :custom
@@ -598,6 +608,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** COMMENT dumb-jump
 #+begin_src emacs-lisp
 (use-package dumb-jump
+  :straight t
   :custom
   (dumb-jump-prefer-searcher 'rg))
 
@@ -608,19 +619,22 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** editoronfig
 #+begin_src emacs-lisp
 (use-package editorconfig
+  :straight t
   :config
   (editorconfig-mode 1))
 #+end_src
 ** envrc
 #+begin_src emacs-lisp
 (use-package envrc
+  :straight t
   :custom
   (envrc-show-summary-in-minibuffer nil)
   :hook (after-init . envrc-global-mode))
 #+end_src
 ** fzf
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package fzf
+  :straight t
   :bind
     ;; Don't forget to set keybinds!
   :config
@@ -638,6 +652,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** helpful
 #+begin_src emacs-lisp
 (use-package helpful
+  :straight t
   :commands (helpful-callable
              helpful-variable
              helpful-key
@@ -660,6 +675,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package highlight-indent-guides
+  :straight t
   :custom
   (highlight-indent-guides-method 'character)
   (highlight-indent-guides-auto-odd-face-perc 75)
@@ -672,6 +688,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package multiple-cursors
+  :straight t
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)
@@ -682,6 +699,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package no-littering
+  :straight t
   :init
   (require 'recentf)
   (setq auto-save-file-name-transforms
@@ -699,6 +717,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
+  :straight t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 #+end_src
@@ -706,6 +725,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package undo-fu
+  :straight t
   :init
   (setq undo-limit (* 8 1024 1024))
   (setq undo-strong-limit (* 64 1024 1024))
@@ -717,6 +737,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package undo-fu-session
+  :straight t
   :config
   (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
   :commands undo-fu-session-global-mode
@@ -725,6 +746,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package vundo
+  :straight t
   :config
   (setq vundo-compact-display t)
   (global-set-key (kbd "C-x u") 'vundo))
@@ -733,6 +755,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package ws-butler
+  :straight t
   :custom
   (ws-butler-keep-whitespace-before-point nil)
   :hook
@@ -751,6 +774,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package diff-hl
+  :straight t
   :custom
   (diff-hl-draw-borders nil)
   (diff-hl-side 'left)
@@ -778,8 +802,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 ** magit
 
-#+begin_src emacs-lisp :results silent
+#+begin_src emacs-lisp
 (use-package magit
+  :straight t
   :bind (:prefix-map magit-prefix-map
          :prefix "C-c v"
          ("s" . magit-status)
@@ -795,12 +820,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package magit-delta
+  :straight t
   :after magit
   :hook (magit-mode . magit-delta-mode))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package magit-prime
+  :straight t
   :after magit
   :config
   (magit-prime-mode t))
@@ -808,9 +835,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package magit-todos
+  :straight t
   :after magit
   :config (magit-todos-mode t))
 #+end_src
+
 * languages
 ** COMMENT ASP
 
@@ -825,6 +854,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package cmake-mode
+  ;; :straight t
   :defer t
   :mode ("CMakeLists.txt" . cmake-mode))
 #+end_src
@@ -846,6 +876,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package fish-mode
+  :straight t
   :mode "\\.fish\\'"
   :defer t)
 #+end_src
@@ -855,7 +886,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defer t
-  :ensure auctex
   :hook
   (LaTeX-mode . LaTeX-math-mode)
   (LaTeX-mode . turn-on-reftex)
@@ -889,6 +919,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package auctex-latexmk
+  :straight t
   :defer t
   :init
   (auctex-latexmk-setup)
@@ -907,6 +938,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package lua-mode
+  :straight t
   :defer t
   :custom
   (lua-indent-level 4))
@@ -915,6 +947,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package nix-ts-mode
+  :straight t
   :mode "\\.nix\\'"
   :defer t)
 #+end_src
@@ -922,13 +955,16 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package tuareg
+  :straight t
   :defer t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
 
 (use-package dune
+  :straight t
   :defer t)
 
 (use-package utop
+  :straight t
   :defer t
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode)
@@ -937,6 +973,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   )
 
 (use-package ocaml-eglot
+  :straight t
   :after tuareg
   :hook
   (tuareg-mode . ocaml-eglot)
@@ -946,6 +983,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package python
+  :straight t
   :defer t
   :config
   (setq-default python-indent-offset 4)
@@ -954,6 +992,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package pet
+  :straight t
   :custom
   (python-shell-interpreter "python")
 
@@ -973,6 +1012,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package rust-mode
+  :straight t
   :mode "\\.rs\\'"
   :init
   (setq rust-mode-treesitter-derive t)
@@ -982,6 +1022,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package cargo
+  :straight t
   :delight cargo-minor-mode
   :hook (rust-mode . cargo-minor-mode))
 #+end_src
@@ -1024,6 +1065,7 @@ https://github.com/radian-software/apheleia/issues/278
 
 #+begin_src emacs-lisp
 (use-package json-mode
+  :straight t
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
 ** markdown
@@ -1039,9 +1081,11 @@ https://github.com/radian-software/apheleia/issues/278
   (setq-default markdown-enable-math t))
 #+end_src
 ** toml
+  :straight t
 
 #+begin_src emacs-lisp
 (use-package toml-mode
+  :straight t
   :defer t
   :mode "\\.toml\\'")
 #+end_src
@@ -1050,14 +1094,22 @@ https://github.com/radian-software/apheleia/issues/278
 ** rg
 
 #+begin_src emacs-lisp
-(use-package rg)
+(use-package rg
+  :straight t)
 #+end_src
 
 * completion
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (push ".DS_store" completion-ignored-extensions))
+#+end_src
 ** cape
 
 #+begin_src emacs-lisp
 (use-package cape
+  :straight t
   :bind (:prefix-map cape-prefix-map :prefix "C-c p")
   (:map cape-prefix-map
         ("p" . completion-at-point) ;; capf
@@ -1093,26 +1145,10 @@ https://github.com/radian-software/apheleia/issues/278
 ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 #+end_src
 ** consult
-*** local macros
 
-Macro to add the same regex to a collection of consult filters.
-These buffers can be seen by using space
-
-#+begin_src emacs-lisp :results silent
-(defmacro add-to-consult-hide-filter (regex)
-  `(progn
-     (with-eval-after-load 'consult
-       (add-to-list 'recentf-exclude ,(format "%s" regex))
-       (add-to-list 'consult-buffer-filter ,(format "%s" regex)))))
-
-(add-to-consult-hide-filter "clangd")
-(add-to-consult-hide-filter "magit")
-(add-to-consult-hide-filter "lsp")
-#+end_src
-*** main
-
-#+begin_src emacs-lisp :results silent :noweb yes
+#+begin_src emacs-lisp :noweb yes
 (use-package consult
+  :straight t
   :bind ((:prefix-map consult-search-prefix-map :prefix "C-c s")
          (:map consult-search-prefix-map
                ("d" . consult-find)                  ;; Alternative: consult-fd
@@ -1169,7 +1205,8 @@ These buffers can be seen by using space
   (completion-list-mode . consult-preview-at-point-mode)
 
   :init
-  ;; Configure the register formatting. This improves the register preview for `consult-register', `consult-register-load', `consult-register-store' and the Emacs built-ins.
+  ;; Configure the register formatting.
+  ;; This improves the register preview for `consult-register', `consult-register-load', `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5)
   (setq register-preview-function #'consult-register-format)
 
@@ -1196,11 +1233,24 @@ These buffers can be seen by using space
   (setq consult-narrow-key "<"))
 #+end_src
 
+*** macros
+
+Macro to add the same regex to a collection of consult filters.
+These buffers can be seen by using space
+
 #+begin_src emacs-lisp
+(defmacro add-to-consult-hide-filter (regex)
+  `(progn
+     (with-eval-after-load 'consult
+       (add-to-list 'recentf-exclude ,(format "%s" regex))
+       (add-to-list 'consult-buffer-filter ,(format "%s" regex)))))
+
+(add-to-consult-hide-filter "clangd")
+(add-to-consult-hide-filter "magit")
+(add-to-consult-hide-filter "lsp")
 (add-to-consult-hide-filter "\*EGLOT")
 (add-to-consult-hide-filter "\*Flymake")
 #+end_src
-*** macro
 **** narrowing
 
 Set project to use uppercase key
@@ -1244,8 +1294,7 @@ Instances of the macro
   (consult-filter-macro "Org" '(org-mode) ?o)
   (consult-filter-macro "Python" '(python-mode python-ts-mode) ?p)
   (consult-filter-macro "Rust" '(rust-mode rust-ts-mode) ?r)
-  (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t)
-  )
+  (consult-filter-macro "TeX" '(latex-mode LaTeX-mode tex-mode TeX-mode) ?t))
 #+end_src
 ***** other
 
@@ -1264,12 +1313,14 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp
 (use-package consult-project-extra
+  ;; :straight t
   :bind (("C-x p o" . consult-project-extra-find)))
 #+end_src
 ** corfu
 
 #+begin_src emacs-lisp
 (use-package corfu
+  :straight t
   :init
   (global-corfu-mode)
 
@@ -1292,6 +1343,7 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp :result silent
 (use-package marginalia
+  :straight t
   :init
   (marginalia-mode)
   :bind (:map minibuffer-local-map
@@ -1304,6 +1356,7 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp
 (use-package orderless
+  :straight t
   :custom
   (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
@@ -1315,6 +1368,7 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp
 (use-package vertico
+  :straight t
   :init
   (vertico-mode)
   (vertico-multiform-mode)
@@ -1328,6 +1382,7 @@ https://github.com/Qkessler/consult-project-extra
 
 #+begin_src emacs-lisp
 (use-package embark
+  :straight t
   :bind (("C-c a" . embark-act)         ;; pick some comfortable binding
          ("C-;" . embark-dwim)        ;; good alternative: M-.
          ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
@@ -1347,13 +1402,9 @@ https://github.com/Qkessler/consult-project-extra
 #+begin_src emacs-lisp
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
+  :straight t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
-#+end_src
-** ignored extensions
-
-#+begin_src emacs-lisp
-(push ".DS_store" completion-ignored-extensions)
 #+end_src
 
 * lsp
@@ -1439,6 +1490,7 @@ for rust dev
 *** eglot-tempel
 #+begin_src emacs-lisp
 (use-package eglot-tempel
+  :straight t
   :after eglot
   :preface (eglot-tempel-mode)
   :init
@@ -1447,6 +1499,7 @@ for rust dev
 *** consult
 #+begin_src emacs-lisp
 (use-package consult-eglot
+  :straight t
   :after eglot)
 #+end_src
 *** workspaces
@@ -1581,6 +1634,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package treesit-auto
+  :straight t
   :demand t
   :custom
   (global-treesit-auto-mode nil)
@@ -1597,6 +1651,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package tempel
+  :straight t
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert)
          :map tempel-map

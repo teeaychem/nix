@@ -38,7 +38,7 @@
 
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
-  :pin melpa-stable
+  :straight t
   :if (memq system-type '(darwin))
   :demand
   :init
