@@ -241,9 +241,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 ** eldoc
 #+begin_src emacs-lisp
+
+(use-package eglot-signature-eldoc-talkative
+  :straight t)
+
 (use-package eldoc
+  :straight t
   :init
   (global-eldoc-mode)
+
+  (advice-add #'eglot-signature-eldoc-function
+              :override #'eglot-signature-eldoc-talkative)
 
   ;; Try to ensure flymake errors come before any other eldoc messages
   (defun eldoc-promote-flymake ()
@@ -541,6 +549,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 (use-package browse-kill-ring
   :straight t)
 #+end_src
+** ctrlf
+#+begin_src emacs-lisp
+(use-package ctrlf
+  :straight t
+  :init
+  (ctrlf-mode t))
+#+end_src
 ** current-window-only
 
 #+begin_src emacs-lisp
@@ -551,7 +566,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 #+begin_src emacs-lisp
 (use-package devdocs
-  :straight t
+  ;; :straight t
   :defer t
   :bind (("C-h D" . 'devdocs-lookup)))
 #+end_src
@@ -612,7 +627,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("M-b" . dirvish-history-go-backward)
    ("M-e" . dirvish-emerge-menu)))
 #+end_src
-** COMMENT dumb-jump
+** dumb-jump
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :straight t
@@ -1422,7 +1437,8 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (use-package eglot
-  :pin manual
+  :straight t
+  ;; :pin manual
   :custom
   ;; (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   (eglot-report-progress nil)
@@ -1688,6 +1704,7 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package dape
+  :straight t
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
   ;; If you do not want to use any prefix, set it to nil.
