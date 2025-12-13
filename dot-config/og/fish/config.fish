@@ -23,41 +23,8 @@ if test (uname) = Darwin
     eval "$(/opt/homebrew/bin/brew shellenv)"
 end
 
-# bison
-
-# if brew_ok
-#     fish_add_path /opt/homebrew/opt/bison/bin
-#     set -gx LDFLAGS -L/opt/homebrew/opt/bison/lib
-# end
-
-# clingo
-# if command -v clingo >/dev/null 2>&1
-#     set -gx CLINGO_LIBRARY_PATH "$HOMEBREW_PREFIX/opt/clingo/lib"
-#     set -gx LD_LIBRARY_PATH "$LD_LIBRARY_PATH:$CLINGO_LIBRARY_PATH"
-# end
-
-# conan // https://docs.conan.io/2/reference/environment.html#environment-variables
-# set -gx CONAN_HOME "$XDG_CONFIG_HOME/conan2"
-
 # docker
 set -gx DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
-
-# dotnet
-# fish_add_path "$HOME/.dotnet/tools"
-# set -gx NUGET_PACKAGES "$XDG_CACHE_HOME/NuGetPackages"
-
-# if brew_ok
-#     set -gx DOTNET_ROOT "$HOMEBREW_PREFIX/opt/dotnet/libexec"
-# end
-
-# flex
-
-# if brew_ok
-#     fish_add_path /opt/homebrew/opt/flex/bin
-
-#     set -gx LDFLAGS -L/opt/homebrew/opt/flex/lib
-#     set -gx CPPFLAGS -I/opt/homebrew/opt/flex/include
-# end
 
 # hammerspoon
 # defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
@@ -82,7 +49,6 @@ set -gx NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
 fish_add_path "./node_modules/.bin"
 
 # OCaml
-
 set -gx OPAMROOT "$XDG_DATA_HOME/opam"
 
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
@@ -97,11 +63,6 @@ set -gx MPLCONFIGDIR "$XDG_CACHE_HOME/matplotlib"
 
 # rust
 source "$HOME/.cargo/env.fish"
-
-# vcpkg
-# set -gx VCPKG_ROOT "$XDG_DATA_HOME/vcpkg"
-# fish_add_path "$VCPKG_ROOT"
-# set -gx VCPKG_FORCE_SYSTEM_BINARIES 1
 
 # etc
 
@@ -125,7 +86,3 @@ fzf --fish | source
 zoxide init fish | source
 
 direnv hook fish | source
-
-if command -q nix-your-shell
-  nix-your-shell fish | source
-end
