@@ -12,7 +12,7 @@
     homeDirectory = "/Users/sparkes";
 
     file.".config" = {
-      source = ./config;
+      source = ../dot-config/og;
       recursive = true;
     };
 
@@ -59,8 +59,8 @@
   xdg.enable = true;
 
   imports = [
-    ../common/git.nix
-    ../common/tmux.nix
+    ../dot-config/nix/git.nix
+    ../dot-config/nix/tmux.nix
   ];
 
 }

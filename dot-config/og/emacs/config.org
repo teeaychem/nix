@@ -544,6 +544,11 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
               ("a" . apheleia-format-buffer))
   )
 #+end_src
+** bookmark+
+#+begin_src emacs-lisp
+(use-package bookmark+
+  :straight t)
+#+end_src
 ** browse kill ring
 #+begin_src emacs-lisp
 (use-package browse-kill-ring
