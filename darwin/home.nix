@@ -47,12 +47,23 @@
 
   programs = {
     fish.enable = true;
+
     home-manager.enable = true;
+
     starship = {
       enable = true;
       enableFishIntegration = true;
     };
 
+    gpg = {
+      enable = true;
+    };
+
+  };
+
+  services.gpg-agent = {
+    enable = true;
+    enableFishIntegration = true;
   };
 
   xdg.enable = true;
