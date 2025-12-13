@@ -20,7 +20,6 @@
       hunspell
       imagemagick
       neovim
-      nix-your-shell
       nixfmt-rfc-style
       pkg-configUpstream # ?pkg-config fails
       ripgrep
