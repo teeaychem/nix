@@ -46,7 +46,6 @@
   };
 
   programs = {
-    direnv.enable = true;
     fish.enable = true;
     home-manager.enable = true;
     starship = {
@@ -59,6 +58,7 @@
   xdg.enable = true;
 
   imports = [
+    ../dot-config/nix/direnv.nix
     ../dot-config/nix/git.nix
     ../dot-config/nix/tmux.nix
   ];
