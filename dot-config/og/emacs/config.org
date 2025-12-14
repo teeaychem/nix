@@ -134,8 +134,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 (use-package emacs
   :bind (:prefix-map window-prefix-map
-                     :prefix "C-c w")
-  (:map window-prefix-map
+         :prefix "C-c w")
+  :bind (:repeat-map window-prefix-map
+        :exit
+        :continue
         ("<left>"  . windmove-left)
         ("<right>" . windmove-right)
         ("<up>  "  . windmove-up)
