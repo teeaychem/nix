@@ -21,11 +21,13 @@
       imagemagick
       neovim
       nixfmt-rfc-style
+      pass
       pkg-configUpstream # ?pkg-config fails
       ripgrep
       starship
       tmux
       typos
+      yazi
       zellij
       zoxide
 
@@ -77,7 +79,7 @@
     enable = true;
     onActivation.autoUpdate = true;
     taps = [
-      "d12frosted/emacs-plus"
+      # "d12frosted/emacs-plus"
     ];
     brews = [
       # "emacs-plus@30"
@@ -88,7 +90,6 @@
       "raycast"
       "rectangle"
       "skim"
-      "xld"
       "vlc"
     ];
     caskArgs.no_quarantine = true;

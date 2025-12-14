@@ -42,6 +42,7 @@
       feishin
       keka
       keepassxc
+      xld
     ];
   };
 
