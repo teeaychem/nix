@@ -38,6 +38,7 @@
       ruff
       # rust-analyzer
       taplo
+      universal-ctags
 
       feishin
       keka
