@@ -588,33 +588,32 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :config
   (setq dired-listing-switches
         "-l --almost-all --human-readable --group-directories-first --no-group")
-  ;; this command is useful when you want to close the window of `dirvish-side'
-  ;; automatically when opening a file
+  ;; useful when you want to close the window of `dirvish-side'  when opening a file
   (put 'dired-find-alternate-file 'disabled nil))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package dirvish
   :straight t
+
   :init
   (dirvish-override-dired-mode)
+
   :custom
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
    '(("h" "~/"                         "home")
      ("p" "~/projects/"                "projects")))
+
   :config
   (dirvish-peek-mode)             ; Preview files in minibuffer
-  ;; (dirvish-side-follow-mode)      ; similar to `treemacs-follow-mode'
-  (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes           ; The order *MATTERS* for some attributes
-        '(vc-state subtree-state nerd-icons collapse git-msg file-time file-size)
-        dirvish-side-attributes
-        '(vc-state nerd-icons collapse file-size))
-  ;; open large directory (over 20000 files) asynchronously with `fd' command
+        '(subtree-state collapse git-msg file-time file-size))
+  (setq dirvish-side-attributes '(collapse file-size))
   (setq dirvish-large-directory-threshold 20000)
+  
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
-  (("C-c t" . dirvish)
+  (("C-c x" . dirvish)
    :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
    (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
    ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
@@ -628,7 +627,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("*"   . dirvish-mark-menu)
    ("y"   . dirvish-yank-menu)
    ("N"   . dirvish-narrow)
-   ("^"   . dirvish-history-last)
+   ;;   ("^"   . dirvish-history-last)
    ("TAB" . dirvish-subtree-toggle)
    ("M-f" . dirvish-history-go-forward)
    ("M-b" . dirvish-history-go-backward)
