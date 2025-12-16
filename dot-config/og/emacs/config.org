@@ -1491,16 +1491,23 @@ maybe: https://github.com/casouri/eldoc-box
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'eglot
+
   ;; (add-to-list 'eglot-server-programs '(LaTeX-mode . ("TexLab")))
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd"
-                                                             "--background-index"
-                                                             "--clang-tidy"
-                                                             "--completion-style=detailed"
-                                                             "--header-insertion-decorators"
-                                                             "--fallback-style=None")))
+  (let* ((query-driver (if (eq window-system 'w32)
+                           "--query-driver=*:\\**\\*"
+                         "--query-driver=/**/*")))
+    (add-to-list 'eglot-server-programs `((c++-mode c-mode) "clangd"
+                                          ,query-driver
+                                          "--background-index"
+                                          "--clang-tidy"
+                                          "--completion-style=detailed"
+                                          "--header-insertion=never"
+                                          ;; "--header-insertion-decorators"
+                                          "--fallback-style=None"
+                                          "-j=4")))
   (add-to-list 'eglot-server-programs '(python-mode . ("pyrefly" "lsp")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
