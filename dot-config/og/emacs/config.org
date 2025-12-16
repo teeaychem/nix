@@ -879,14 +879,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :vc (:fetcher github :repo teeaychem/clingo-asp-mode))
 ;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
 #+end_src
-** C/pp
-
-#+begin_src emacs-lisp
-(use-package cmake-mode
-  ;; :straight t
-  :defer t
-  :mode ("CMakeLists.txt" . cmake-mode))
-#+end_src
 ** COMMENT COBOL
 
 #+begin_src emacs-lisp
