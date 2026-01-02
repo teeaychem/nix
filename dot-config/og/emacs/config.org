@@ -417,10 +417,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 * themes
 
 #+begin_src emacs-lisp
-(use-package doom-themes
-  :straight t
-  :config
-  (setq ring-bell-function #'doom-themes-visual-bell-fn visible-bell t))
+ (defun visible-bell-invert ()
+   (invert-face 'mode-line)
+   (run-with-timer 0.2 nil 'invert-face 'mode-line))
+
+(setq visible-bell t)
+(setq ring-bell-function #'visible-bell-invert)
 #+end_src
 
 #+begin_src emacs-lisp
