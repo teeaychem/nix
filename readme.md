@@ -20,6 +20,12 @@ nixfmt **.nix
 home-manager -f /etc/nix-darwin/darwin/home.nix news
 ```
 
+Update: Lock, and then switch (as above).
+
+``` shell
+nix flake update --flake <flake_directory>
+```
+
 ## getting started
 
 ``` shell
