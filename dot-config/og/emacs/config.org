@@ -217,7 +217,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  (setq-default line-spacing 1)
+  (setq-default line-spacing nil)
   (global-font-lock-mode t)
   (global-hi-lock-mode t)
 
@@ -325,16 +325,14 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (savehist-file  (concat user-emacs-directory "var/savehist"))
   (savehist-additional-variables
    '(buffer-name-history
-     compile-command
      extended-command-history
      file-name-history
-     kill-ring))
-  (savehist-autosave-interval 600)
-  (savehist-additional-variables
-   '(kill-ring                        ; clipboard
+     kill-ring
+     mark-ring global-mark-ring
      register-alist                   ; macros
-     mark-ring global-mark-ring       ; marks
-     search-ring regexp-search-ring)))
+     search-ring regexp-search-ring
+     compile-command))
+  (savehist-autosave-interval 600))
 
 #+end_src
 ** skeletons
@@ -594,32 +592,32 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
   :custom
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
-   '(("h" "~/"                         "home")
-     ("p" "~/projects/"                "projects")))
+   '(("h" "~/"          "home")
+     ("p" "~/projects/" "projects")))
 
   :config
-  (dirvish-peek-mode)             ; Preview files in minibuffer
+  (dirvish-peek-mode)
+  (setq dirvish-peek-key '(:debounce 0.5 any))
   (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
-  (setq dirvish-attributes           ; The order *MATTERS* for some attributes
-        '(subtree-state collapse git-msg file-time file-size))
+  (setq dirvish-attributes '(subtree-state collapse file-time file-size)) ; The order *matters* for some attributes
   (setq dirvish-side-attributes '(collapse file-size))
   (setq dirvish-large-directory-threshold 20000)
   
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
   (("C-c x" . dirvish)
-   :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
-   (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
-   ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
-   ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
-   ("f"   . dirvish-file-info-menu)    ; [f]ile info
-   ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
-   ("s"   . dirvish-quicksort)         ; [s]ort flie list
-   ("r"   . dirvish-history-jump)      ; [r]ecent visited
-   ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
-   ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
-   ("*"   . dirvish-mark-menu)
-   ("y"   . dirvish-yank-menu)
-   ("N"   . dirvish-narrow)
+   :map dirvish-mode-map             ; Dirvish inherits `dired-mode-map'
+   (";" . dired-up-directory)        ; So you can adjust `dired' bindings here
+   ("?" . dirvish-dispatch)          ; [?] a helpful cheatsheet
+   ("a" . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+   ("f" . dirvish-file-info-menu)    ; [f]ile info
+   ("o" . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+   ("s" . dirvish-quicksort)         ; [s]ort flie list
+   ("r" . dirvish-history-jump)      ; [r]ecent visited
+   ("l" . dirvish-ls-switches-menu)  ; [l]s command flags
+   ("v" . dirvish-vc-menu)           ; [v]ersion control commands
+   ("*" . dirvish-mark-menu)
+   ("y" . dirvish-yank-menu)
+   ("N" . dirvish-narrow)
    ;;   ("^"   . dirvish-history-last)
    ("TAB" . dirvish-subtree-toggle)
    ("M-f" . dirvish-history-go-forward)
@@ -799,6 +797,8 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
                                   (change . "/")
                                   (unknown . "?")
                                   (ignored . "i")))
+  (vc-git-diff-switches '("--histogram"))
+  ;; (diff-hl-update-async 'thread)
 
   :config
   (global-diff-hl-mode)
@@ -1213,7 +1213,8 @@ https://github.com/radian-software/apheleia/issues/278
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
 
-  :config ;; Configure other variables and modes in the :config section, after lazily loading the package.
+  :config
+  (setq consult-peek-key '(:debounce 0.5 any))
 
   ;; Optionally configure preview. The default value is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
@@ -1221,10 +1222,19 @@ https://github.com/radian-software/apheleia/issues/278
   ;; For some commands and buffer sources it is useful to configure the :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register consult--source-recent-file consult--source-project-recent-file
+   consult-ripgrep
+   consult-git-grep
+   consult-grep
+   consult-bookmark
+   consult-recent-file
+   consult-xref
+   consult--source-bookmark
+   consult--source-buffer
+   consult--source-file-register
+   consult--source-recent-file
+   consult--source-project-recent-file
    ;; :preview-key "M-."
-   :preview-key '(:debounce 0.4 any))
+   :preview-key '(:debounce 0.5 any))
 
   (setq consult-narrow-key "<"))
 #+end_src
@@ -1241,11 +1251,15 @@ These buffers can be seen by using space
        (add-to-list 'recentf-exclude ,(format "%s" regex))
        (add-to-list 'consult-buffer-filter ,(format "%s" regex)))))
 
-(add-to-consult-hide-filter "clangd")
-(add-to-consult-hide-filter "magit")
-(add-to-consult-hide-filter "lsp")
+(add-to-consult-hide-filter "\*Async-native-compile")
 (add-to-consult-hide-filter "\*EGLOT")
 (add-to-consult-hide-filter "\*Flymake")
+(add-to-consult-hide-filter "\*aphelelia")
+(add-to-consult-hide-filter "\*envrc")
+(add-to-consult-hide-filter "\*straight")
+(add-to-consult-hide-filter "clangd")
+(add-to-consult-hide-filter "lsp")
+(add-to-consult-hide-filter "magit")
 #+end_src
 **** narrowing
 
