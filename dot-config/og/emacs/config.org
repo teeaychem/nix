@@ -36,7 +36,6 @@ https://github.com/editorconfig/editorconfig-emacs?tab=readme-ov-file https://ed
   (setq-default indent-tabs-mode nil)
 
   (delete-selection-mode t) ;; delete selected text by typing
-
   (global-auto-revert-mode t) ; for reloading bib files, etc.
   (global-subword-mode)
 
@@ -129,6 +128,10 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
    ("C-x K" . kill-buffer)
 
    ("M-DEL" . backward-delete-word)
+
+   ("M-u" . 'upcase-dwim)
+   ("M-l" . 'downcase-dwim)
+   ("M-c" . 'capitalize-dwim)
 
    ("RET" . newline)))
 #+end_src
@@ -602,7 +605,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq dirvish-attributes '(subtree-state collapse file-time file-size)) ; The order *matters* for some attributes
   (setq dirvish-side-attributes '(collapse file-size))
   (setq dirvish-large-directory-threshold 20000)
-  
+
   :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
   (("C-c x" . dirvish)
    :map dirvish-mode-map             ; Dirvish inherits `dired-mode-map'
@@ -1472,7 +1475,10 @@ maybe: https://github.com/casouri/eldoc-box
   :straight t
   ;; :pin manual
   :custom
-  ;; (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
+  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider
+                                       :colorProvider
+                                       :foldingRangeProvider
+                                       :semanticTokensProvider))
   (eglot-report-progress nil)
   (eglot-extend-to-xref t)
   (corfu-preview-current nil)
@@ -1533,7 +1539,7 @@ maybe: https://github.com/casouri/eldoc-box
                                           ;; "--header-insertion-decorators"
                                           "--fallback-style=None"
                                           "-j=4")))
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyrefly" "lsp")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
   )
