@@ -2,8 +2,10 @@
   inputs,
   outputs,
   pkgs,
+  pkgs-unstable,
   ...
 }:
+
 {
 
   home = {
@@ -16,34 +18,35 @@
       recursive = true;
     };
 
-    packages = with pkgs; [
-      cmake
-      emacs-derived-plus
-      gnugrep
-      lazygit
-      qemu
+    packages = [
+      pkgs.cmake
+      pkgs.emacs-derived-plus
+      pkgs.gnugrep
+      pkgs.lazygit
+      pkgs.qemu
 
-      cvc5
-      z3
+      pkgs.cvc5
+      pkgs.z3
 
-      python3
+      pkgs.python3
 
       # llvmPackages_21.clang-tools
-      comrak # GF(Markdown)
-      gersemi
-      luajitPackages.luarocks
-      nil
-      prettier
-      pyrefly
-      ruff
-      # rust-analyzer
-      taplo
-      universal-ctags
+      pkgs.comrak # GF(Markdown)
+      pkgs.gersemi
+      pkgs.luajitPackages.luarocks
+      pkgs.nil
+      pkgs.prettier
+      pkgs.ruff
+      # pkgs.rust-analyzer
+      pkgs.taplo
+      pkgs.universal-ctags
 
-      feishin
-      keka
-      keepassxc
-      xld
+      pkgs.feishin
+      pkgs.keka
+      pkgs.keepassxc
+      pkgs.xld
+
+      pkgs-unstable.ty
     ];
   };
 

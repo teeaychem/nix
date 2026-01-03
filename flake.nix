@@ -7,8 +7,15 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # nix-darwin.url = "github:nix-darwin/nix-darwin/master";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-darwin-unstable = {
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -71,6 +78,13 @@
         overlays = common-overlays ++ [ ];
       };
 
+      pkgs-unstable = import nixpkgs-unstable {
+        hostPlatform = "aarch64-darwin";
+        system = "aarch64-darwin";
+        config = pkg-config;
+        overlays = [ ];
+      };
+
     in
 
     {
@@ -83,7 +97,7 @@
       homeConfigurations = {
         sparkes = inputs.home-manager.lib.homeManagerConfiguration {
           pkgs = darwin-pkgs;
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = { inherit inputs outputs pkgs-unstable; };
           modules = [ ./darwin/home.nix ];
         };
       };
