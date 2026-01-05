@@ -52,8 +52,7 @@ fish_add_path "./node_modules/.bin"
 set -gx OPAMROOT "$XDG_DATA_HOME/opam"
 
 # This adds: the correct directories to the PATH, auto-completion for the opam binary
-test -r '/Users/sparkes/.share/opam/opam-init/init.fish' && source '/Users/sparkes/.share/opam/opam-init/init.fish' > /dev/null 2> /dev/null; or true
-
+test -r '/Users/sparkes/.share/opam/opam-init/init.fish' && source '/Users/sparkes/.share/opam/opam-init/init.fish' >/dev/null 2>/dev/null; or true
 
 # python
 set -gx PYTHONPYCACHEPREFIX "$XDG_CACHE_HOME/python_cache"
@@ -67,8 +66,39 @@ source "$HOME/.cargo/env.fish"
 # etc
 
 ## https://fishshell.com/docs/current/faq.html#faq-history
-function last_history_item; echo $history[1]; end
+function last_history_item
+    echo $history[1]
+end
 abbr -a !! --position anywhere --function last_history_item
+
+function fish_should_add_to_history
+    # Ignore all uses of the following
+    for cmd in man which ls cd z pkgconf pkg-config
+        string match -qr "^$cmd" -- "$argv"; and return 1
+    end
+
+    # Ignore specific cargo commands
+    if string match -qr "^cargo (init)" -- "$argv"
+        return 1
+    end
+
+    # Ignore specific git
+    if string match -qr "^git (add|commit|pop|remove|rename|restore|rm|stash|status|submodule)" -- "$argv"
+        return 1
+    end
+
+    # Ignore some `-` terminating args
+    if string match -qr "\-(v|V|h|H)\$" -- "$argv"
+        return 1
+    end
+
+    # Ignore some `--` terminating args
+    if string match -qr "\-\-(help)\$" -- "$argv"
+        return 1
+    end
+
+    return 0
+end
 
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
