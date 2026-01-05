@@ -103,6 +103,17 @@ end
 # fzf
 set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
 
+function fzfp
+    fzf --layout='default' \
+        --ansi \
+        --preview-window=top,75%,sharp,wrap \
+        --bind 'focus:transform-header:file --brief {}' \
+        --bind='ctrl-d:abort' \
+        --bind='ctrl-s:change-preview(stat {})' \
+        --bind='ctrl-e:change-preview(bat -n --color=always {})' \
+        --bind='ctrl-w:toggle-preview'
+end
+
 # setup
 
 if status is-interactive
