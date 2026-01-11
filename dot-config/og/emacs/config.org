@@ -411,7 +411,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+end_src
 
 #+begin_src emacs-lisp
-(load-config "config-darwin")
+(if (memq system-type '(darwin)) (load-config "config-darwin"))
+(if (memq system-type '(gnu/linux)) (load-config "config-gnu"))
+(if (memq system-type '(windows-nt)) (load-config "config-nt"))
 (load-config "config-org")
 #+end_src
 
@@ -798,8 +800,9 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 * vc
 ** diff-hl
 #+begin_src emacs-lisp
-(use-package diff-hl
+(use-package diff-hl  
   :straight t
+  :if (not (memq system-type '(windows-nt)))
   :custom
   (diff-hl-draw-borders nil)
   (diff-hl-side 'left)
