@@ -85,8 +85,8 @@
       # "emacs-plus@30"
     ];
     casks = [
-      "doll"
       "hammerspoon"
+      "iina"
       "raycast"
       "rectangle"
       "skim"
