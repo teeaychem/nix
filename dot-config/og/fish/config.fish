@@ -21,6 +21,7 @@ set -x XDG_VIDEOS_DIR "$HOME/Videos"
 
 if test (uname) = Darwin
     eval "$(/opt/homebrew/bin/brew shellenv)"
+    fish_add_path "/opt/homebrew/opt/llvm/bin/"
 end
 
 # docker

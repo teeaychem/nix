@@ -13,6 +13,7 @@
     systemPackages = with pkgs; [
       bat
       bitwise
+      cmake
       coreutils
       delta
       fd
@@ -83,6 +84,7 @@
     ];
     brews = [
       # "emacs-plus@30"
+      "llvm"
     ];
     casks = [
       "hammerspoon"
