@@ -56,69 +56,35 @@ function pyclean() {
 }
 
 # # # macos
-function pfd() {
-  osascript 2>/dev/null <<EOF
-    tell application "Finder"
-      return POSIX path of (insertion location as alias)
-    end tell
-EOF
-}
-
-function cdf() {
-  cd "$(pfd)"
-}
-
 function rmdsstore() {
   find "${@:-.}" -type f -name .DS_Store -delete
 }
-
-
-# # # misc. functions
-
-function find-up() {
-  search_path=$(pwd)
-  while [[ "$search_path" != "" && ! -e "$search_path/$1" ]]; do
-    search_path=${search_path%/*}
-  done
-  if [[  -e $search_path ]]; then
-      echo "$search_path"
-  else
-      echo "failure: could not find $1 in any parent of $(pwd)"
-  fi
-}
-
-
-function venv-up() {
-  search_path=$(pwd)
-  while [[ "$search_path" != "" && ! -e "$search_path/.venv" ]]; do
-    search_path=${search_path%/*}
-  done
-  if [[  -e $search_path ]]; then
-      source "$search_path/.venv/bin/activate"
-  else
-      echo "failure: could not find a .venv folder in any parent of $(pwd)"
-  fi
-}
-
 
 # # # completions
 
 # compinstall
 # https://github.com/zsh-users/zsh-completions
 
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*'
-zstyle ':completion:*:functions' ignored-patterns '_*'
-zstyle :compinstall filename '~/.config/zsh/.zshrc'
+# zstyle ':completion:*' completer _complete _match _approximate
+# zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*'
+# zstyle ':completion:*:functions' ignored-patterns '_*'
+# zstyle :compinstall filename '~/.config/zsh/.zshrc'
 
-if [[ $(uname) == "Darwin" ]]; then
-    if type brew &>/dev/null; then
-        FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+# if [[ $(uname) == "Darwin" ]]; then
+#     if type brew &>/dev/null; then
+#         FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
 
-        autoload -Uz compinit
-        compinit -u
-    fi
-fi
+#         autoload -Uz compinit
+#         compinit -u
+#     fi
+# fi
+
+
+autoload -U compinit && compinit
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+source <(carapace _carapace)
+
 
 # Additionally, if you receive "zsh compinit: insecure directories" warnings when attempting to load these completions, you may need to run these commands:
 # chmod go-w '/opt/homebrew/share'
@@ -128,14 +94,11 @@ fi
 # # # autosuggestions
 
 # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
-if [[ $(uname) == "Darwin" ]]; then
-    source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
+# if [[ $(uname) == "Darwin" ]]; then
+#     source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# fi
 
 eval "$(starship init zsh)"
-
-# Created by `pipx` on 2025-02-22 13:25:58
-export PATH="$PATH:/Users/sparkes/.local/bin"
 
 # fzf
 source <(fzf --zsh)
