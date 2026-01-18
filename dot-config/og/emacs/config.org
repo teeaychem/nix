@@ -385,6 +385,27 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq lazy-count-suffix-format nil)
   (setq search-whitespace-regexp ".*?"))
 #+end_src
+** tramp
+#+begin_src emacs-lisp
+(use-package tramp
+  :config
+  (connection-local-set-profile-variables
+   'remote-direct-async-process
+   '((tramp-direct-async-process . t)))
+
+  (connection-local-set-profiles
+   '(:application tramp :protocol "scp")
+   'remote-direct-async-process)
+
+  (setq magit-tramp-pipe-stty-settings 'pty)
+
+  :custom
+  (remote-file-name-inhibit-locks t)
+  (tramp-use-scp-direct-remote-copying t)
+  (remote-file-name-inhibit-auto-save-visited t)
+  (tramp-copy-size-limit (* 1024 1024))
+)
+#+end_src
 ** which-key
 #+begin_src emacs-lisp
 (use-package which-key
