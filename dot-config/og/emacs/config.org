@@ -73,13 +73,13 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setq-default delete-by-moving-to-trash t)
 
   :custom
-  (backup-directory-alist `(("." . ,(concat user-emacs-directory "var/backups")))
-                          backup-by-copying t       ; don't clobber symlinks
-                          kept-new-versions 10      ; keep 10 latest versions
-                          kept-old-versions 0       ; don't bother with old versions
-                          delete-old-versions t     ; don't ask about deleting old S versions
-                          version-control t         ; number backups
-                          vc-make-backup-files nil) ; backup version controlled files
+  (backup-directory-alist `(("." . ,(concat user-emacs-directory "var/backups"))))
+  (backup-by-copying t)      ; don't clobber symlinks
+  (kept-new-versions 10)     ; keep 10 latest versions
+  (kept-old-versions 0)      ; don't bother with old versions
+  (delete-old-versions t)    ; don't ask about deleting old versions
+  (version-control t)        ; number backups
+  (vc-make-backup-files nil) ; backup version controlled files
   )
 #+end_src
 *** locale
@@ -528,18 +528,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
-                                                        "-style={BasedOnStyle: LLVM,
-                                                                 ColumnLimit: 0,
-                                                                 AlignConsecutiveMacros: None}"
                                                         "-assume-filename"
                                                         (or (apheleia-formatters-local-buffer-file-name)
                                                             (apheleia-formatters-mode-extension)
                                                             ".c")))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
-                                                        "-style={BasedOnStyle: LLVM,
-                                                                 ColumnLimit: 0,
-                                                                 AlignConsecutiveMacros: None}"
                                                         "-assume-filename"
                                                         (or (apheleia-formatters-local-buffer-file-name)
                                                             (apheleia-formatters-mode-extension)
@@ -783,7 +777,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** ws-butler
 #+begin_src emacs-lisp
 (use-package ws-butler
-  :straight t
+  :straight (ws-butler :type git :host github :repo "ws-butler")
   :custom
   (ws-butler-keep-whitespace-before-point nil)
   :hook
@@ -1244,11 +1238,11 @@ https://github.com/radian-software/apheleia/issues/278
    consult-bookmark
    consult-recent-file
    consult-xref
-   consult--source-bookmark
-   consult--source-buffer
-   consult--source-file-register
-   consult--source-recent-file
-   consult--source-project-recent-file
+   consult-source-bookmark
+   consult-source-buffer
+   consult-source-file-register
+   consult-source-recent-file
+   consult-source-project-recent-file
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.5 any))
 
@@ -1543,7 +1537,7 @@ maybe: https://github.com/casouri/eldoc-box
   (let* ((query-driver (if (eq window-system 'w32)
                            "--query-driver=*:\\**\\*"
                          "--query-driver=/**/*")))
-    (add-to-list 'eglot-server-programs `((c++-mode c-mode) "clangd"
+    (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
                                           ,query-driver
                                           "--background-index"
                                           "--clang-tidy"
