@@ -19,7 +19,7 @@
     };
 
     packages = [
-      pkgs.cmake
+
       pkgs.emacs-derived-plus
       pkgs.gnugrep
       pkgs.lazygit
@@ -32,13 +32,10 @@
 
       # llvmPackages_21.clang-tools
       pkgs.comrak # GF(Markdown)
-      pkgs.gersemi
-      pkgs.luajitPackages.luarocks
-      pkgs.nil
+
+
       pkgs.prettier
-      pkgs.ruff
-      # pkgs.rust-analyzer
-      pkgs.taplo
+
       pkgs.universal-ctags
 
       pkgs.feishin
@@ -46,17 +43,37 @@
       pkgs.keepassxc
       pkgs.xld
 
+      # cmake
+      pkgs.cmake
+      pkgs.gersemi
+
+      # lua
+      pkgs.luajitPackages.luarocks
+
+      # nix
+      pkgs.nil
+
+      # python
+      pkgs.ruff
       pkgs-unstable.ty
+      pkgs-unstable.uv
+
+      # rust
+      # pkgs.rust-analyzer
+
+      # toml
+      pkgs.taplo
     ];
   };
 
   programs = {
-    fish.enable = true;
+    bash.enable = true;
 
     home-manager.enable = true;
 
     starship = {
       enable = true;
+      enableBashIntegration = true;
       enableFishIntegration = true;
     };
 

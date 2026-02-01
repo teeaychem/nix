@@ -12,14 +12,16 @@
 
     systemPackages = with pkgs; [
       bat
+      blesh
       bitwise
-      cmake
+      clang-tools
       coreutils
       delta
       fd
       fzf
       hunspell
       imagemagick
+      navidrome
       neovim
       nixfmt-rfc-style
       pass
@@ -97,13 +99,13 @@
     caskArgs.no_quarantine = true;
   };
 
-  programs.fish.enable = true;
+  programs.bash.enable = true;
 
   users = {
     knownUsers = [ config.system.primaryUser ];
     users.${config.system.primaryUser} = {
       uid = 501;
-      shell = pkgs.fish;
+      shell = pkgs.bash;
     };
   };
 }
