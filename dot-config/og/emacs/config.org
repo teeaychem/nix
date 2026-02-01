@@ -798,7 +798,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 ** ws-butler
 #+begin_src emacs-lisp
 (use-package ws-butler
-  :straight (ws-butler :type git :host github :repo "ws-butler")
+  :straight (ws-butler :type git :host github :repo "lewang/ws-butler" :branch "master")
   :custom
   (ws-butler-keep-whitespace-before-point nil)
   :hook
@@ -1555,7 +1555,7 @@ maybe: https://github.com/casouri/eldoc-box
   (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) .
                                         ("rust-analyzer"
                                          :initializationOptions (:check (:command "clippy")))))
-  (let* ((query-driver (if (eq window-system 'w32)
+  (let* ((query-driver (if (eq system-type 'windows-nt)
                            "--query-driver=*:\\**\\*"
                          "--query-driver=/**/*")))
     (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
@@ -1567,9 +1567,18 @@ maybe: https://github.com/casouri/eldoc-box
                                           ;; "--header-insertion-decorators"
                                           "--fallback-style=None"
                                           "-j=4")))
+  (add-to-list 'eglot-server-programs `((c-mode c++-mode) "clangd"
+                                          "--background-index"
+                                          "--clang-tidy"
+                                          "--completion-style=detailed"
+                                          "--header-insertion=never"
+                                          ;; "--header-insertion-decorators"
+                                          "--fallback-style=None"
+                                          "-j=4"))
   (add-to-list 'eglot-server-programs '(python-mode . ("ty" "server")))
   (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
   (add-to-list 'eglot-server-programs '(csharp-mode . ("omnisharp" "*.sln" "-lsp")))
+  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
   )
 #+end_src
 *** eglot-x
