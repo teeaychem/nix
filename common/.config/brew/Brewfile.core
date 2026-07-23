@@ -24,6 +24,10 @@ brew "git"
 brew "git-delta"
 brew "git-lfs"
 
+# javascript
+
+brew "prettier"
+
 # rust
 brew "rust-analyzer"
 

@@ -1200,6 +1200,9 @@ Supported values are `bottom' and `right'.")
 
   (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(yapf ruff-isort))
+  (setf (alist-get 'js-ts-mode apheleia-mode-alist) '(prettier))
+  (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(prettier))
+  (setf (alist-get 'tsx-ts-mode apheleia-mode-alist) '(prettier))
 
   (setf (alist-get 'clang-format apheleia-formatters) '("clang-format"
                                                         "-assume-filename"
@@ -3185,12 +3188,15 @@ https://github.com/renzmann/treesit-auto
                         c
                         cpp
                         cmake
+                        javascript
                         json
                         lua
                         ;; nix
                         python
                         rust
                         toml
+                        tsx
+                        typescript
                         yaml))
 
   :init

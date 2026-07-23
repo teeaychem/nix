@@ -24,7 +24,6 @@ brew "gitui"
 
 # linting
 brew "gersemi"   # cmake
-brew "prettier"
 brew "texlab"    # TeX
 brew "typos-cli" # typos
 
