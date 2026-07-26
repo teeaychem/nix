@@ -4,7 +4,7 @@ set -eu
 
 usage() {
     printf '%s\n' \
-        'usage: emc [--host HOST] [--] [FILE ...]' \
+        'usage: ect [--host HOST] [--] [FILE ...]' \
         '' \
         'Open files in a terminal Emacs client, starting a daemon if necessary.' \
         '' \
@@ -13,7 +13,7 @@ usage() {
 }
 
 die() {
-    printf 'emc: %s\n' "$*" >&2
+    printf 'ect: %s\n' "$*" >&2
     exit 2
 }
 
@@ -84,7 +84,7 @@ if [ -n "$host" ]; then
 
     require_command ssh
 
-    remote_error=$(shell_quote "emc: remote directory not found: $PWD")
+    remote_error=$(shell_quote "ect: remote directory not found: $PWD")
     remote_command="cd $(shell_quote "$PWD") || { printf '%s\n' $remote_error >&2; exit 2; }; exec emacsclient --tty --alternate-editor='' --"
     for argument; do
         remote_command="$remote_command $(shell_quote "$argument")"
@@ -93,5 +93,8 @@ if [ -n "$host" ]; then
 fi
 
 require_command emacsclient
-emacsclient --alternate-editor= --eval "$(env_sync_form)" >/dev/null
+# Do not start the daemon headlessly: startup prompts need the tty client.
+if emacsclient --eval "$(env_sync_form)" >/dev/null 2>&1; then
+    :
+fi
 exec emacsclient --tty --alternate-editor= -- "$@"
