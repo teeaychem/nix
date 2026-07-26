@@ -26,7 +26,6 @@ setenv PYTHON_HISTORY "$env(XDG_STATE_HOME)/python/history"
 setenv IPYTHONDIR "$env(XDG_CACHE_HOME)/ipython"
 setenv MPLCONFIGDIR "$env(XDG_CACHE_HOME)/matplotlib"
 
-setenv DOCKER_CONFIG "$env(XDG_CONFIG_HOME)/docker"
 setenv DICTIONARY en_GB
 setenv DICPATH "$env(XDG_DATA_HOME)/hunspell"
 setenv LESSHISTFILE "$env(XDG_STATE_HOME)/less/history"
