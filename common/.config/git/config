@@ -21,6 +21,10 @@
 
 [fetch]
 	prune = true
+	writeCommitGraph = true
+
+[feature]
+	manyFiles = true
 
 [filter "lfs"]
 	clean = "git-lfs clean -- %f"
@@ -34,6 +38,9 @@
 [interactive]
 	diffFilter = "delta --color-only"
 
+[merge]
+	conflictStyle = zdiff3
+
 [pull]
 	ff = only
 
@@ -41,7 +48,7 @@
 	autosquash = true
 
 [rerere]
-	enabled = false
+	enabled = true
 
 [status]
 	branch = true
