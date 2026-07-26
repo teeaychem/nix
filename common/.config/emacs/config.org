@@ -1863,6 +1863,12 @@ To highlight indentations
          ("r" . magit-refresh))
 
   :custom
+  ;; Delta is used for diffs
+  (magit-diff-fontify-hunk nil)
+  (magit-diff-refine-hunk nil)
+  (magit-diff-paint-whitespace nil)
+  (magit-diff-highlight-indentation nil)
+  (magit-diff-highlight-trailing nil)
   (magit-log-arguments '("--graph" "--decorate" "--color"))
   ;; (magit-commit-show-diff nil)
   (magit-branch-direct-configure nil)
