@@ -3189,6 +3189,7 @@ https://github.com/renzmann/treesit-auto
                         cpp
                         cmake
                         javascript
+                        jsdoc
                         json
                         lua
                         ;; nix
