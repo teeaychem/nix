@@ -1210,7 +1210,13 @@ Supported values are `bottom' and `right'.")
                                                             (apheleia-formatters-mode-extension)
                                                             ".cpp")))
 
-  (push '(gersemi . ("gersemi" "-")) apheleia-formatters)
+  (defun my/gersemi-config-arguments ()
+    "Return arguments for the nearest project-local Gersemi configuration."
+    (when-let* ((root (locate-dominating-file default-directory ".gersemirc")))
+      (list "--config" (expand-file-name ".gersemirc" root))))
+
+  (setf (alist-get 'gersemi apheleia-formatters)
+        '("gersemi" (my/gersemi-config-arguments) "-"))
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
 
   (push '(raco-fmt . ("raco" "fmt")) apheleia-formatters)
