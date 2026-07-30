@@ -64,4 +64,4 @@ hunspell/dictionaries/README*
 
 /.agent-shell/
 
-/htop/htop_history
+**/htop/htop_history
