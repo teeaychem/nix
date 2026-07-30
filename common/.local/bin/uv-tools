@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+uv tool install pre-commit
+uv tool install ruff
+uv tool install ty
+
+tool_bin=$(uv tool dir --bin)
+tool_bin=$(CDPATH= cd "$tool_bin" && pwd -P)
+
+case ":${PATH-}:" in
+    *":$tool_bin:"*) ;;
+    *)
+        printf 'Warning: uv tools are installed in %s, which is not on PATH.\n' "$tool_bin" >&2
+        printf 'Run `uv tool update-shell` or add it to your shell PATH.\n' >&2
+        ;;
+esac
