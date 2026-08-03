@@ -165,6 +165,7 @@ if status is-interactive
     fish_default_key_bindings
 
     bind ctrl-h backward-kill-word
+    bind ctrl-delete kill-path-component
     bind shift-tab accept-autosuggestion
     bind ctrl-left backward-word
     bind ctrl-right forward-word
