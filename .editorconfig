@@ -11,3 +11,6 @@ trim_trailing_whitespace = true
 
 [*.lua]
 indent_size = 4
+
+[*.{sh,bash,zsh,fish}]
+indent_size = 2
