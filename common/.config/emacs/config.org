@@ -2928,6 +2928,16 @@ terminals."
 ** vertico
 
 #+begin_src emacs-lisp
+(defun my/vertico-dotfile-p (candidate)
+  (let ((name (file-name-nondirectory (directory-file-name candidate))))
+    (and (string-prefix-p "." name) (not (member name '("." ".."))))))
+
+(defun my/vertico-sort-dotfiles-last (candidates)
+  (let (regular dotfiles)
+    (dolist (candidate (vertico-sort-alpha candidates))
+      (if (my/vertico-dotfile-p candidate) (push candidate dotfiles) (push candidate regular)))
+    (nconc (nreverse regular) (nreverse dotfiles))))
+
 (use-package vertico
   :elpaca t
   :demand t
@@ -2937,7 +2947,7 @@ terminals."
   (vertico-count 16) ;; Show more candidates
   (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
   (vertico-cycle nil)
-  (vertico-multiform-commands '((find-file (vertico-sort-function . vertico-sort-alpha))))
+  (vertico-multiform-categories '((file (vertico-sort-function . my/vertico-sort-dotfiles-last))))
 
   :config
   (vertico-mode 1)
