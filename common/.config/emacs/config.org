@@ -1838,10 +1838,19 @@ To highlight indentations
   ;; (diff-hl-update-async 'thread)
 
   :config
+  (defun my/vc-git-expand-root (root)
+    (when root
+      (expand-file-name root)))
+  (advice-add 'vc-git-root :filter-return #'my/vc-git-expand-root)
   (global-diff-hl-mode 1)
   (diff-hl-margin-mode 1)
   (diff-hl-flydiff-mode -1)
   (diff-hl-show-hunk-mouse-mode -1)
+  (defun my/diff-hl-recenter-after-navigation (&rest _)
+    (when (called-interactively-p 'interactive)
+      (recenter)))
+  (advice-add 'diff-hl-next-hunk :after #'my/diff-hl-recenter-after-navigation)
+  (advice-add 'diff-hl-previous-hunk :after #'my/diff-hl-recenter-after-navigation)
   ;; (diff-hl-update-async t)
   ;; (set-face-attribute 'diff-hl-change nil :background (face-attribute 'default :background))
   ;; (set-face-attribute 'diff-hl-insert nil :background (face-attribute 'default :background))
