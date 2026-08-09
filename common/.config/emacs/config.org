@@ -183,10 +183,17 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (global-auto-revert-mode 1))
 
 (defun my/revert-all-buffers ()
-  "Immediately check all buffers managed by Auto-Revert."
+  "Immediately revert changed, unmodified file buffers.
+Unlike `auto-revert-buffers', this checks the file directly rather
+than waiting for a file-notification event."
   (interactive)
-  (let ((auto-revert-stop-on-user-input nil))
-    (auto-revert-buffers)))
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (and buffer-file-name
+                 (not (file-remote-p buffer-file-name))
+                 (not (buffer-modified-p))
+                 (not (verify-visited-file-modtime buffer)))
+        (revert-buffer 'ignore-auto 'dont-ask 'preserve-modes)))))
 
 (defun my/kill-buffers-visiting-missing-files ()
   "Kill unmodified local-file buffers whose files no longer exist and report each modified buffer that was retained."
