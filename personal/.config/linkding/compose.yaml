@@ -1,0 +1,9 @@
+services:
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: linkding
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ${XDG_DATA_HOME:?Set XDG_DATA_HOME}/linkding:/etc/linkding/data
+    restart: unless-stopped
