@@ -3038,43 +3038,81 @@ maybe: https://github.com/casouri/eldoc-box
     (when (derived-mode-p 'mlir-mode)
       (setq-local completion-at-point-functions
                   (cons #'my/mlir-eglot-completion-at-point
-                        (remove #'eglot-completion-at-point
-                                completion-at-point-functions)))))
+                        (remove #'eglot-completion-at-point completion-at-point-functions)))))
 
   (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
   ;; (add-hook 'eglot-managed-mode-hook (lambda () (when (derived-mode-p 'mlir-mode) (my/mlir-eglot-setup))))
 
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (let ((clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
-    (add-to-list 'eglot-server-programs
-                 `((c-ts-mode c++-ts-mode) .
-                   ("clangd"
-                    ;; Project compiler drivers are trusted, including custom toolchains.
-                    "--query-driver=/usr/bin/**,/opt/homebrew/**,/usr/local/**,/home/linuxbrew/.linuxbrew/**"
-                    "--background-index"
+  (defun my/clangd--path-variants (path)
+    "Return PATH and its canonical path when PATH is executable."
+    (when (and path (file-executable-p path))
+      (delete-dups (list (expand-file-name path) (file-truename path)))))
+
+  (defun my/clangd--find-executables (names directories)
+    "Find executable NAMES in DIRECTORIES and on `exec-path'."
+    (let (paths)
+      (dolist (directory directories)
+        (dolist (name names)
+          (let ((path (expand-file-name name directory))) (when (file-executable-p path) (push path paths)))))
+      (dolist (name names)
+        (let ((path (executable-find name))) (when path (push path paths))))
+      (delete-dups (nreverse paths))))
+
+  (defun my/clangd--compiler-names (clangd)
+    "Return standard compiler names matching CLANGD's version, if any."
+    (let ((names '("clang" "clang++")))
+      (dolist (path (my/clangd--path-variants clangd))
+        (when (string-match "\\`clangd\\(.+\\)\\'" (file-name-nondirectory path))
+          (let ((suffix (match-string 1 path)))
+            (setq names (append names (list (concat "clang" suffix) (concat "clang++" suffix)))))))
+      (delete-dups names)))
+
+  (defun my/clangd-query-drivers (clangd)
+    "Return trusted Clang driver paths associated with CLANGD.
+
+Both the symlink spelling and canonical path are included because compilation
+databases may use either.  `cc' and `c++' are included only when they resolve
+to one of the discovered Clang drivers."
+    (let* ((clangd-paths (my/clangd--path-variants clangd))
+           (directories (delete-dups (mapcar #'file-name-directory clangd-paths)))
+           (drivers (my/clangd--find-executables (my/clangd--compiler-names clangd) directories))
+           (canonical-drivers (delete-dups (mapcar #'file-truename drivers)))
+           (aliases (delq nil (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
+                                      (my/clangd--find-executables '("cc" "c++") directories)))))
+      (delete-dups (apply #'append (mapcar #'my/clangd--path-variants (append drivers aliases))))))
+
+  (defun my/eglot-clangd (&optional _interactive _project)
+    "Return the generic, cross-platform clangd command for Eglot."
+    (let* ((clangd (or (executable-find "clangd") "clangd"))
+           (drivers (and (file-executable-p clangd) (my/clangd-query-drivers clangd)))
+           (clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
+      (append (list clangd)
+              ;; `--query-driver' causes clangd to execute argv[0] from a compile command, so allow only explicit local Clang paths.
+              (when drivers (list (concat "--query-driver=" (mapconcat #'identity drivers ","))))
+              (list "--background-index"
                     "--clang-tidy"
                     "--completion-style=detailed"
                     "--header-insertion=never"
                     "--fallback-style=None"
-                    ,(concat "-j=" clangd-jobs)))))
+                    (concat "-j=" clangd-jobs)))))
+
+  (setf (alist-get '(c-ts-mode c++-ts-mode) eglot-server-programs nil nil #'equal) #'my/eglot-clangd)
 
   (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
          (lua-args (if (file-exists-p config-path)
                        (list "lua-language-server" (concat "--configpath=" config-path))
                      '("lua-language-server"))))
-    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal)
-          lua-args))
+    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal) lua-args))
 
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
   (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("ty" "server")))
-  (add-to-list 'eglot-server-programs '(rust-ts-mode .
-                                        ("rust-analyzer"
-                                         :initializationOptions (:check (:command "clippy")))))
-  (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) .
-                                        ("taplo" "lsp" "stdio")))
+  (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer"
+                                                        :initializationOptions (:check (:command "clippy")))))
+  (add-to-list 'eglot-server-programs '((toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
 
   (add-to-list 'eglot-server-programs `((mlir-mode :language-id "mlir") . my-eglot-strict-mlir))
   (add-to-list 'eglot-server-programs `((pdll-mode :language-id "pdll") . my-eglot-strict-pdll))
