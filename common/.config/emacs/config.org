@@ -282,8 +282,7 @@ than waiting for a file-notification event."
 
   :config
   (require 'dired-x)
-  (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
+  (setq dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group")
   ;; useful when you want to close the window of `dirvish-side'  when opening a file
   (put 'dired-find-alternate-file 'disabled nil)
 
@@ -314,14 +313,12 @@ than waiting for a file-notification event."
   :init
   (defun my/editorconfig-display-fill-column-indicator (props)
     "Show a fill-column indicator when PROPS set max_line_length."
-    (if (and (editorconfig-string-integer-p (gethash 'max_line_length props))
-             (> fill-column 0))
+    (if (and (editorconfig-string-integer-p (gethash 'max_line_length props)) (> fill-column 0))
         (display-fill-column-indicator-mode 1)
       (display-fill-column-indicator-mode -1)))
 
   :config
-  (add-hook 'editorconfig-after-apply-functions
-            #'my/editorconfig-display-fill-column-indicator)
+  (add-hook 'editorconfig-after-apply-functions #'my/editorconfig-display-fill-column-indicator)
   (editorconfig-mode 1))
 #+end_src
 
@@ -360,9 +357,7 @@ Supported values are `bottom' and `right'.")
                    (min 80 (max 1 (/ (frame-width) 3)))))
            (action-alist (append `((side . ,side)
                                    (slot . 0)
-                                   ,(if (eq side 'bottom)
-                                        `(window-height . ,size)
-                                      `(window-width . ,size)))
+                                   ,(if (eq side 'bottom) `(window-height . ,size) `(window-width . ,size)))
                                  alist))
            (window (or (display-buffer-reuse-window buffer action-alist)
                        (let ((window-sides-vertical nil))
@@ -403,16 +398,14 @@ Supported values are `bottom' and `right'.")
   (defun my/eldoc-toggle-doc-buffer ()
     "Toggle the displayed Eldoc documentation window."
     (interactive)
-    (if (and (buffer-live-p eldoc--doc-buffer)
-             (get-buffer-window eldoc--doc-buffer t))
+    (if (and (buffer-live-p eldoc--doc-buffer) (get-buffer-window eldoc--doc-buffer t))
         (my/eldoc-quit-doc-buffer)
       (eldoc-doc-buffer t)))
 
   (defun my/eldoc-toggle-window-side ()
     "Toggle the Eldoc window between the bottom and right side."
     (interactive)
-    (setq my/eldoc-window-side
-          (if (eq my/eldoc-window-side 'bottom) 'right 'bottom))
+    (setq my/eldoc-window-side (if (eq my/eldoc-window-side 'bottom) 'right 'bottom))
     (when-let* ((buffer (get-buffer "*eldoc*")))
       (when-let* ((window (get-buffer-window buffer t)))
         (delete-window window))
@@ -582,9 +575,7 @@ Supported values are `bottom' and `right'.")
 
   :custom
   (ispell-program-name "hunspell")
-  (ispell-personal-dictionary
-   (expand-file-name "hunspell/dictionaries/hunspell_personal"
-                     (getenv "XDG_CONFIG_HOME")))
+  (ispell-personal-dictionary (expand-file-name "hunspell/dictionaries/hunspell_personal" (getenv "XDG_CONFIG_HOME")))
   (ispell-dictionary "en_GB")
 
   ;; :hook
@@ -617,8 +608,7 @@ Supported values are `bottom' and `right'.")
   (keymap-global-unset "C-<wheel-down>")
   (keymap-global-unset "C-<wheel-up>")
 
-  (setq context-menu-functions
-        (delete 'context-menu-undo context-menu-functions))
+  (setq context-menu-functions (delete 'context-menu-undo context-menu-functions))
 
   :bind
   ("<mouse-3>" . #'context-menu-open)
@@ -675,8 +665,6 @@ Supported values are `bottom' and `right'.")
 
 #+begin_src emacs-lisp
 (use-package savehist
-  :commands (savehist-mode savehist-save)
-
   :custom
   (savehist-file  (concat user-emacs-directory "var/savehist"))
   (savehist-additional-variables
@@ -796,11 +784,9 @@ Supported values are `bottom' and `right'.")
   :elpaca nil
 
   :config
-  (connection-local-set-profile-variables
-   'remote-direct-async-process '((tramp-direct-async-process . t)))
+  (connection-local-set-profile-variables 'remote-direct-async-process '((tramp-direct-async-process . t)))
 
-  (connection-local-set-profiles
-   '(:application tramp :protocol "scp") 'remote-direct-async-process)
+  (connection-local-set-profiles '(:application tramp :protocol "scp") 'remote-direct-async-process)
 
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
@@ -971,9 +957,7 @@ Supported values are `bottom' and `right'.")
       (message "%s"
                (mapconcat (lambda (diag)
                             (flymake-diagnostic-text diag
-                             (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
-                                 (alist-get t flymake-diagnostic-format-alist)
-                                 '(origin code oneliner))))
+                             (or (alist-get :eldoc-echo flymake-diagnostic-format-alist) (alist-get t flymake-diagnostic-format-alist) '(origin code oneliner))))
                           diags "\n"))))
 
   (defun my/flymake-diagnostics-at-point-setup ()
@@ -983,8 +967,7 @@ Supported values are `bottom' and `right'.")
       (remove-hook 'post-command-hook #'my/flymake-diagnostics-at-point t)))
 
   :config
-  (setq flymake-diagnostic-format-alist
-        '((t . (origin code message))))
+  (setq flymake-diagnostic-format-alist '((t . (origin code message))))
   :bind (:map goto-prefix-map
               :prefix "d"
               :prefix-map flymake-mode-prefix-map)
@@ -1060,6 +1043,7 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package batppuccin
   :elpaca (batppuccin :type git :host github :repo "bbatsov/batppuccin-emacs")
+
   :config
   (load-theme 'batppuccin-mocha t))
 #+end_src
@@ -1139,10 +1123,8 @@ Supported values are `bottom' and `right'.")
   (defun my/apheleia-format-region (beg end)
     "Format region between BEG and END using Apheleia's formatter for this mode."
     (interactive "r")
-    (unless (use-region-p)
-      (user-error "No active region"))
-    (when-let* ((err (apheleia--disallowed-p)))
-      (user-error err))
+    (unless (use-region-p) (user-error "No active region"))
+    (when-let* ((err (apheleia--disallowed-p))) (user-error err))
     (let* ((source-buffer (current-buffer))
            (source-file buffer-file-name)
            (source-directory default-directory)
@@ -1167,9 +1149,7 @@ Supported values are `bottom' and `right'.")
                   (apheleia-format-buffer
                    formatters
                    nil
-                   :callback (lambda (&rest args)
-                               (setq format-error (plist-get args :error))
-                               (setq done t))))
+                   :callback (lambda (&rest args) (setq format-error (plist-get args :error)) (setq done t))))
                 (while (not done)
                   (let ((process (buffer-local-value 'apheleia--current-process
                                                      temp-buffer)))
@@ -1179,9 +1159,7 @@ Supported values are `bottom' and `right'.")
                 (unless format-error
                   (let ((formatted (with-current-buffer temp-buffer
                                      (buffer-string))))
-                    (if (/= source-tick
-                            (with-current-buffer source-buffer
-                              (buffer-chars-modified-tick)))
+                    (if (/= source-tick (with-current-buffer source-buffer (buffer-chars-modified-tick)))
                         (message "Apheleia region format skipped: buffer changed")
                       (with-current-buffer source-buffer
                         (delete-region source-beg source-end)
@@ -1189,14 +1167,12 @@ Supported values are `bottom' and `right'.")
                         (insert formatted))))))
             (quit
              (when (buffer-live-p temp-buffer)
-               (let ((process (buffer-local-value 'apheleia--current-process
-                                                  temp-buffer)))
+               (let ((process (buffer-local-value 'apheleia--current-process temp-buffer)))
                  (when (process-live-p process)
                    (process-put process :interrupted t)
                    (interrupt-process process)
                    (accept-process-output process 0.1 nil 'just-this-one)
-                   (when (process-live-p process)
-                     (kill-process process)))))
+                   (when (process-live-p process) (kill-process process)))))
              (signal (car quit) (cdr quit))))
         (set-marker source-beg nil)
         (set-marker source-end nil)
@@ -1293,8 +1269,7 @@ Supported values are `bottom' and `right'.")
   (push "init.el" compile-angel-excluded-files)
 
   (with-eval-after-load "savehist"
-    (push (concat "/" (file-name-nondirectory savehist-file))
-          compile-angel-excluded-files))
+    (push (concat "/" (file-name-nondirectory savehist-file)) compile-angel-excluded-files))
 
   ;; Uncomment the line below to compile automatically when an Elisp file is saved
   ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
@@ -1370,7 +1345,7 @@ Supported values are `bottom' and `right'.")
 (use-package dumb-jump
   :elpaca t
 
-  :commands dumb-jump-xref-activate
+  :defer t
 
   :custom
   (dumb-jump-prefer-searcher 'rg)
@@ -1390,7 +1365,8 @@ Supported values are `bottom' and `right'.")
   :custom
   (envrc-show-summary-in-minibuffer nil)
 
-  :hook (after-init . envrc-global-mode))
+  :config
+  (envrc-global-mode 1))
 #+end_src
 
 ** exec-path-from-shell
@@ -1423,8 +1399,7 @@ Supported values are `bottom' and `right'.")
 
 #+begin_src emacs-lisp
 (use-package ghostel
-  :elpaca (:repo "https://github.com/dakra/ghostel"
-             :files ("lisp/*.el"))
+  :elpaca (:repo "https://github.com/dakra/ghostel" :files ("lisp/*.el"))
 
   :defer t
 
@@ -1439,21 +1414,17 @@ Supported values are `bottom' and `right'.")
 (use-package gumshoe
   :elpaca t
 
-  :hook
-  (after-init . global-gumshoe-mode)
-
   :bind (:map goto-prefix-map
               ("h" . gumshoe-backtrack)
-              ("M" . gumshoe-drop-marker)))
+              ("M" . gumshoe-drop-marker))
+
+  :config
+  (global-gumshoe-mode 1))
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package consult-gumshoe
-  :elpaca (consult-gumshoe
-             :type git
-             :host github
-             :repo "Overdr0ne/gumshoe"
-             :files ("extensions/consult-gumshoe/consult-gumshoe.el"))
+  :elpaca (consult-gumshoe :type git :host github :repo "Overdr0ne/gumshoe" :files ("extensions/consult-gumshoe/consult-gumshoe.el"))
 
   :after (consult gumshoe)
 
@@ -1466,12 +1437,6 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package helpful
   :elpaca t
-  :commands (helpful-callable
-             helpful-variable
-             helpful-key
-             helpful-command
-             helpful-at-point
-             helpful-function)
   :bind
   ([remap describe-command] . helpful-command)
   ([remap describe-function] . helpful-callable)
@@ -1514,11 +1479,7 @@ To highlight indentations
     (when (derived-mode-p 'prog-mode)
       (indent-bars-mode 1)))
 
-  (add-hook 'tty-setup-hook
-            (lambda ()
-              (dolist (buf (buffer-list))
-                (with-current-buffer buf
-                  (my/safe-enable-indent-bars)))))
+  (add-hook 'tty-setup-hook (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
 
   :custom
   (indent-bars-no-stipple-char ?│)
@@ -1592,7 +1553,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package meow
   :elpaca t
-  :commands (meow-global-mode meow-mode meow-tutor)
+  :commands meow-tutor
 
   :config
   (defun my/meow-setup ()
@@ -1703,8 +1664,7 @@ To highlight indentations
   :demand t
 
   :config
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (setq auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
   (setq create-lockfiles nil))
 #+end_src
@@ -1782,7 +1742,8 @@ To highlight indentations
   :custom
   (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
 
-  :hook (after-init . undo-fu-session-global-mode))
+  :config
+  (undo-fu-session-global-mode 1))
 #+end_src
 
 ** vundo
@@ -1810,8 +1771,7 @@ To highlight indentations
   :after magit
 
   :bind
-  (:map magit-prefix-map
-        ("B" . blamer-mode))
+  (:map magit-prefix-map ("B" . blamer-mode))
   ("s-i" . blamer-show-commit-info)
 
   :custom
@@ -1845,17 +1805,13 @@ To highlight indentations
   ;; (diff-hl-update-async 'thread)
 
   :config
-  (defun my/vc-git-expand-root (root)
-    (when root
-      (expand-file-name root)))
+  (defun my/vc-git-expand-root (root) (when root (expand-file-name root)))
   (advice-add 'vc-git-root :filter-return #'my/vc-git-expand-root)
   (global-diff-hl-mode 1)
   (diff-hl-margin-mode 1)
   (diff-hl-flydiff-mode -1)
   (diff-hl-show-hunk-mouse-mode -1)
-  (defun my/diff-hl-recenter-after-navigation (&rest _)
-    (when (called-interactively-p 'interactive)
-      (recenter)))
+  (defun my/diff-hl-recenter-after-navigation (&rest _) (when (called-interactively-p 'interactive) (recenter)))
   (advice-add 'diff-hl-next-hunk :after #'my/diff-hl-recenter-after-navigation)
   (advice-add 'diff-hl-previous-hunk :after #'my/diff-hl-recenter-after-navigation)
   ;; (diff-hl-update-async t)
@@ -1986,8 +1942,7 @@ To highlight indentations
             (progn
               (setq-local fill-column column-limit)
               (display-fill-column-indicator-mode 1)
-              (when (called-interactively-p 'interactive)
-                (message "fill-column set to %d from clang-format" column-limit)))
+              (when (called-interactively-p 'interactive) (message "fill-column set to %d from clang-format" column-limit)))
           (user-error "clang-format ColumnLimit is 0"))
       (user-error "Could not determine clang-format ColumnLimit")))
 
@@ -2056,10 +2011,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package tex
   :mode ("\\.tex\\'" . LaTeX-mode)
-  :elpaca (auctex :repo "git://git.git.savannah.gnu.org/auctex.git"
-                    :branch "main"
-                    :depth 1
-                    :files (:defaults (:exclude "*.xpm")))
+  :elpaca (auctex :repo "git://git.git.savannah.gnu.org/auctex.git" :branch "main" :depth 1 :files (:defaults (:exclude "*.xpm")))
 
   :custom
   (TeX-electric-math (cons "\\(" "\\)"))
@@ -2101,12 +2053,8 @@ To highlight indentations
 
 #+begin_src emacs-lisp
 (use-package nael-mode
-  :elpaca (nael :type git
-                 :host codeberg
-                 :repo "mekeor/nael"
-                 :files ("nael/*.el" "nael/nael.info" "nael/nael.texi"))
-  :mode "\\.lean\\'"
-  :commands (nael-mode))
+  :elpaca (nael :type git :host codeberg :repo "mekeor/nael" :files ("nael/*.el" "nael/nael.info" "nael/nael.texi"))
+  :mode "\\.lean\\'")
 #+end_src
 
 ** lua
@@ -2158,9 +2106,7 @@ Get the relevant package subdirectories from the llvm source
 
 (put 'my/mlir-extra-extensions
      'safe-local-variable
-     (lambda (value)
-       (and (listp value)
-            (seq-every-p #'stringp value))))
+     (lambda (value) (and (listp value) (seq-every-p #'stringp value))))
 
 (defun my/mlir-mode-for-extra-extension ()
   "Use `mlir-mode' for project-local IR extensions."
@@ -2177,15 +2123,11 @@ Get the relevant package subdirectories from the llvm source
 
 (defun my/llvm-file-executable-p (path)
   "Return non-nil when PATH names an executable file."
-  (and (stringp path)
-       (not (string= path ""))
-       (file-executable-p path)))
+  (and (stringp path) (not (string= path "")) (file-executable-p path)))
 
 (defun my/llvm-file-readable-p (path)
   "Return non-nil when PATH names a readable file."
-  (and (stringp path)
-       (not (string= path ""))
-       (file-readable-p path)))
+  (and (stringp path) (not (string= path "")) (file-readable-p path)))
 
 (defun my/llvm-lsp-server-path (setting path fallback interactive)
   "Return explicit PATH, or FALLBACK from `exec-path' when INTERACTIVE.
@@ -2193,27 +2135,18 @@ Signal a user error when neither names an executable."
   (cond
    ((my/llvm-file-executable-p path) path)
    ((and interactive (executable-find fallback)))
-   (t (user-error "Eglot aborted: %s is invalid (%s)"
-                  setting
-                  (or path "Unset")))))
+   (t (user-error "Eglot aborted: %s is invalid (%s)" setting (or path "Unset")))))
 
 (defun my/mlir-lsp-server-path (&optional interactive)
   "Return the MLIR language-server path for the current buffer."
-  (my/llvm-lsp-server-path
-   'my/mlir-lsp-server-bin
-   my/mlir-lsp-server-bin
-   "mlir-lsp-server"
-   interactive))
+  (my/llvm-lsp-server-path 'my/mlir-lsp-server-bin my/mlir-lsp-server-bin "mlir-lsp-server" interactive))
 
 (defconst my/llvm-elisp-sparse-paths
   '("llvm/utils/emacs" "mlir/utils/emacs")
   "LLVM repository paths needed for Emacs Lisp modes.")
 
 (defconst my/elpaca-llvm-source-steps
-  '(my/elpaca-git-sparse-clone
-    elpaca-git--configure-remotes
-    elpaca-git--checkout-ref
-    my/elpaca-llvm-sparse-checkout)
+  '(my/elpaca-git-sparse-clone elpaca-git--configure-remotes elpaca-git--checkout-ref my/elpaca-llvm-sparse-checkout)
   "Elpaca source steps for LLVM sparse checkout.")
 
 (defun my/elpaca-git-sparse-clone (e)
@@ -2243,22 +2176,13 @@ Signal a user error when neither names an executable."
     (elpaca--make-process e
       :name "sparse-checkout"
       :command `("git" "sparse-checkout" "set" ,@my/llvm-elisp-sparse-paths)
-      :sentinel (lambda (process event)
-                  (elpaca--process-sentinel "Sparse checkout set" process event)))))
+      :sentinel (lambda (process event) (elpaca--process-sentinel "Sparse checkout set" process event)))))
 
 (defun my/elpaca-llvm-source (e)
   "Populate LLVM source files for E using sparse checkout."
-  (setf (elpaca<-build-steps e)
-        (append my/elpaca-llvm-source-steps (elpaca<-build-steps e)))
-  (elpaca-continue e))
+  (setf (elpaca<-build-steps e) (append my/elpaca-llvm-source-steps (elpaca<-build-steps e))) (elpaca-continue e))
 
-(elpaca (llvm-project-modes :host github
-                            :repo "llvm/llvm-project"
-                            :files ("llvm/utils/emacs/*.el"
-                                    "mlir/utils/emacs/*.el")
-                            :main nil
-                            :build (:sub elpaca-source
-                                         my/elpaca-llvm-source))
+(elpaca (llvm-project-modes :host github :repo "llvm/llvm-project" :files ("llvm/utils/emacs/*.el" "mlir/utils/emacs/*.el") :main nil :build (:sub elpaca-source my/elpaca-llvm-source))
   (use-package mlir-mode
     :elpaca nil
     :mode (("\\.mlir\\'" . mlir-mode)
@@ -2267,20 +2191,13 @@ Signal a user error when neither names an executable."
     :init
     (defun my-eglot-strict-mlir (&optional interactive _project)
       "Return the MLIR language-server command for the current buffer."
-      (let ((server-path (my/mlir-lsp-server-path interactive)))
-        (list server-path)))
+      (let ((server-path (my/mlir-lsp-server-path interactive))) (list server-path)))
 
     (defun my-eglot-strict-pdll (&optional interactive _project)
       "Return the PDLL language-server command for the current buffer."
-      (let ((server-path (my/llvm-lsp-server-path
-                          'my/mlir-pdll-lsp-server-bin
-                          my/mlir-pdll-lsp-server-bin
-                          "mlir-pdll-lsp-server"
-                          interactive))
+      (let ((server-path (my/llvm-lsp-server-path 'my/mlir-pdll-lsp-server-bin my/mlir-pdll-lsp-server-bin "mlir-pdll-lsp-server" interactive))
             (db-path my/pdll-compilation-database))
-        (unless (my/llvm-file-readable-p db-path)
-          (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)"
-                      (or db-path "Unset")))
+        (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: PDLL compilation database setting is invalid (%s)" (or db-path "Unset")))
         (list server-path (format "--pdll-compilation-database=%s" db-path))))
 
     :config
@@ -2293,15 +2210,9 @@ Signal a user error when neither names an executable."
     :init
     (defun my-eglot-strict-tablegen (&optional interactive _project)
       "Return the TableGen language-server command for the current buffer."
-      (let ((server-path (my/llvm-lsp-server-path
-                          'my/tablegen-lsp-server-bin
-                          my/tablegen-lsp-server-bin
-                          "tblgen-lsp-server"
-                          interactive))
+      (let ((server-path (my/llvm-lsp-server-path 'my/tablegen-lsp-server-bin my/tablegen-lsp-server-bin "tblgen-lsp-server" interactive))
             (db-path my/tablegen-compilation-database))
-        (unless (my/llvm-file-readable-p db-path)
-          (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)"
-                      (or db-path "Unset")))
+        (unless (my/llvm-file-readable-p db-path) (user-error "Eglot aborted: TableGen compilation database setting is invalid (%s)" (or db-path "Unset")))
         (list server-path (format "--tablegen-compilation-database=%s" db-path)))))
 
   (use-package llvm-mode
@@ -2418,32 +2329,19 @@ https://robert.kra.hn/posts/rust-emacs-setup/
     "Set `rust-edition' from the current crate's Cargo metadata."
     ;; https://github.com/radian-software/apheleia/issues/278
     (when-let*
-        ((cratedir
-          (locate-dominating-file default-directory "Cargo.toml"))
-         (manifest-path
-          (expand-file-name "Cargo.toml" cratedir))
+        ((cratedir (locate-dominating-file default-directory "Cargo.toml"))
+         (manifest-path (expand-file-name "Cargo.toml" cratedir))
          (env process-environment)
          (path exec-path))
       (setq-local rust-edition
                   (with-temp-buffer
                     (setq-local process-environment env)
                     (setq-local exec-path path)
-                    (let ((retcode
-                           (process-file
-                            "cargo" nil (list (current-buffer) nil) nil
-                            "metadata" "--format-version" "1")))
-                      (when (/= retcode 0)
-                        (error "Cargo metadata --format-version 1 returned %s: %s"
-                               retcode (buffer-string)))
+                    (let ((retcode (process-file "cargo" nil (list (current-buffer) nil) nil "metadata" "--format-version" "1")))
+                      (when (/= retcode 0) (error "Cargo metadata --format-version 1 returned %s: %s" retcode (buffer-string)))
                       (goto-char 0)
-                      (let ((metadata (json-parse-buffer
-                                       :object-type 'alist
-                                       :array-type 'list)))
-                        (cdr (assq 'edition
-                                   (--first
-                                    (string= (cdr (assq 'manifest_path it))
-                                             manifest-path)
-                                    (cdr (assq 'packages metadata)))))))))))
+                      (let ((metadata (json-parse-buffer :object-type 'alist :array-type 'list)))
+                        (cdr (assq 'edition (--first (string= (cdr (assq 'manifest_path it)) manifest-path) (cdr (assq 'packages metadata)))))))))))
 
   :hook
   (rust-ts-mode . my/rust-set-edition))
@@ -2495,7 +2393,6 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package math-preview
   :elpaca (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
-
   :defer t
 
   :custom
@@ -2584,9 +2481,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 #+begin_src emacs-lisp
 (use-package vulpea
   :elpaca t
-  :commands (vulpea-db-sync-full-scan
-             vulpea-find
-             vulpea-insert)
+  :demand t
 
   :init
   (defvar my-org-directory
@@ -2615,13 +2510,8 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 
 #+begin_src emacs-lisp
 (use-package consult-vulpea
-  :elpaca (consult-vulpea
-             :type git
-             :host github
-             :repo "fabcontigiani/consult-vulpea")
+  :elpaca (consult-vulpea :type git :host github :repo "fabcontigiani/consult-vulpea")
   :after vulpea
-  :commands (consult-vulpea-find
-             consult-vulpea-grep)
 
   :init
   (keymap-set my-vulpea-prefix-map "d" #'consult-vulpea-find)
@@ -2903,9 +2793,7 @@ terminals."
   :config
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none))))
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" nil (window-parameters (mode-line-format . none))))
 
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -2935,8 +2823,7 @@ terminals."
   :config
   (marginalia-mode 1)
 
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle)))
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle)))
 
 #+end_src
 
@@ -3222,7 +3109,7 @@ for rust dev
 (use-package consult-eglot
   :elpaca t
 
-  :commands consult-eglot-symbols)
+  :defer t)
 #+end_src
 
 ** workspaces
@@ -3348,9 +3235,9 @@ https://github.com/renzmann/treesit-auto
 
 #+begin_src emacs-lisp
 (use-package dape
-  ;; Keep Dape ordered after Pet: Pet supplies buffer-local Python interpreter, project-root, and `dape-command' settings.
-  :after (eglot pet)
+  :after eglot
   :elpaca t
+  :demand t
 
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
@@ -3360,10 +3247,10 @@ https://github.com/renzmann/treesit-auto
   :hook
   ;; Save breakpoints on quit
   (kill-emacs . dape-breakpoint-save)
-  ;; Load breakpoints on startup
-  (after-init . dape-breakpoint-load)
 
   :config
+  ;; Restore these during startup, before a debugging session is requested.
+  (dape-breakpoint-load)
 
   ;; Turn on global bindings for setting breakpoints with mouse
   (dape-breakpoint-global-mode 1)
@@ -3448,7 +3335,7 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 (use-package gptel-agent
   :elpaca t
 
-  :commands gptel-agent
+  :defer t
 
   :config (gptel-agent-update))         ;Read files from agents directories
 #+end_src
