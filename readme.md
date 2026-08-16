@@ -6,8 +6,6 @@ GNU Stow deploys these packages into `$HOME`:
 - `darwin`: macOS configuration and commands
 - `linux`: Linux configuration
 
-Each package contains `.stow-local-ignore` so Git preserves it even when the
-package otherwise becomes empty.
 
 ## Utils
 

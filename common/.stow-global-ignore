@@ -1,0 +1,2 @@
+# macOS Finder metadata must never be deployed into the home directory.
+^\.DS_Store$
