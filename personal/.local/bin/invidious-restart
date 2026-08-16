@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+PATH=/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin
+config_home=${XDG_CONFIG_HOME:-"$HOME/.config"}
+data_home=${XDG_DATA_HOME:-"$HOME/.local/share"}
+
+cd "$config_home/invidious"
+exec docker compose --env-file "$data_home/invidious/invidious.env" restart
