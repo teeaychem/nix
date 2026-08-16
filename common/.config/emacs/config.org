@@ -1894,7 +1894,21 @@ To highlight indentations
   (magit-log-arguments '("--graph" "--decorate" "--color"))
   ;; (magit-commit-show-diff nil)
   (magit-branch-direct-configure nil)
-  (magit-refresh-status-buffer nil))
+  (magit-refresh-status-buffer nil)
+
+  :config
+  (defun my/magit-display-buffer (buffer)
+    "Display the Magit status buffer in a reusable right-side window."
+    (if (eq (buffer-local-value 'major-mode buffer) 'magit-status-mode)
+        (display-buffer
+         buffer
+         '((display-buffer-in-side-window)
+           (side . right)
+           (slot . 0)
+           (window-width . 0.33)))
+      (magit-display-buffer-traditional buffer)))
+
+  (setq magit-display-buffer-function #'my/magit-display-buffer))
 #+end_src
 
 ** magit-delta
