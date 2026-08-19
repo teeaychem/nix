@@ -378,22 +378,6 @@ Supported values are `bottom' and `right'.")
                          'safe)))
       window))
 
-  (defun my/elisp-eldoc-symbol-documentation (callback &rest _)
-    "Report full documentation for the Emacs Lisp symbol at point."
-    (when-let* ((symbol (symbol-at-point))
-                (doc (cond
-                      ((fboundp symbol) (documentation symbol t))
-                      ((boundp symbol) (documentation-property symbol 'variable-documentation t)))))
-      (funcall callback doc :thing (symbol-name symbol) :echo 'skip)
-      t))
-
-  (defun my/elisp-eldoc-setup ()
-    "Add full symbol documentation to Emacs Lisp Eldoc."
-    (setq-local eldoc-documentation-strategy
-                #'eldoc-documentation-compose)
-    (add-hook 'eldoc-documentation-functions
-              #'my/elisp-eldoc-symbol-documentation t t))
-
   (defun my/eldoc-quit-doc-buffer ()
     "Close the displayed Eldoc documentation window."
     (interactive)
@@ -440,10 +424,7 @@ Supported values are `bottom' and `right'.")
                      ("b" . #'my/eldoc-toggle-doc-buffer)
                      ("t" . #'eldoc-print-current-symbol-info)
                      ("q" . #'my/eldoc-quit-doc-buffer)
-                     ("w" . #'my/eldoc-toggle-window-side))
-
-  :hook
-  (emacs-lisp-mode . my/elisp-eldoc-setup))
+                     ("w" . #'my/eldoc-toggle-window-side)))
 #+end_src
 
 ** elec-pair
