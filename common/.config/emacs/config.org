@@ -44,8 +44,13 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  ;; Add prompt indicator to `completing-read-multiple'. Display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args) (cons (format "[CRM%s] %s" (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator) (car args)) (cdr args)))
+  ;; Add a prompt indicator to `completing-read-multiple', e.g. [CRM,].
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                  (car args))
+          (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   (setq-default indent-tabs-mode nil)
@@ -71,7 +76,8 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
   (translate-upper-case-key-bindings nil)
   (mouse-yank-at-point t)
   (kill-whole-line t)
-  (read-extended-command-predicate #'command-completion-default-include-p) ;; Hide commands in M-x which do not work in the current mode.
+  ;; Hide commands in M-x which do not work in the current mode.
+  (read-extended-command-predicate #'command-completion-default-include-p)
 
   (kill-do-not-save-duplicates t)
   (save-interprogram-paste-before-kill t)
@@ -935,7 +941,7 @@ Supported values are `bottom' and `right'.")
 
 ** flymake
 
-#+begin_src emacs-lisp :result silent
+#+begin_src emacs-lisp :results silent
 (use-package flymake
   :elpaca nil
   :init
@@ -955,9 +961,13 @@ Supported values are `bottom' and `right'.")
     "Show Flymake diagnostics at point in the echo area."
     (when-let* ((diags (flymake-diagnostics (point))))
       (message "%s"
-               (mapconcat (lambda (diag)
-                            (flymake-diagnostic-text diag
-                             (or (alist-get :eldoc-echo flymake-diagnostic-format-alist) (alist-get t flymake-diagnostic-format-alist) '(origin code oneliner))))
+               (mapconcat
+                (lambda (diag)
+                  (flymake-diagnostic-text
+                   diag
+                   (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
+                       (alist-get t flymake-diagnostic-format-alist)
+                       '(origin code oneliner))))
                           diags "\n"))))
 
   (defun my/flymake-diagnostics-at-point-setup ()
@@ -1181,8 +1191,16 @@ Supported values are `bottom' and `right'.")
             (set-buffer-modified-p nil))
           (kill-buffer temp-buffer)))))
 
-  (setf (alist-get 'python-mode apheleia-mode-alist) '(yapf ruff-isort))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(yapf ruff-isort))
+  (defun my/python-apheleia-formatters ()
+    (if (executable-find "yapf")
+        '(my-yapf ruff-isort)
+      '(ruff-isort my-ruff)))
+  (setf (alist-get 'my-yapf apheleia-formatters)
+        '("yapf" "--style" "{column_limit: 320}" "-"))
+  (setf (alist-get 'my-ruff apheleia-formatters)
+        '("ruff" "format" "--silent" "--line-length" "320" "--stdin-filename" filepath "-"))
+  (setf (alist-get 'python-mode apheleia-mode-alist) (my/python-apheleia-formatters))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) (my/python-apheleia-formatters))
   (setf (alist-get 'js-ts-mode apheleia-mode-alist) '(prettier))
   (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(prettier))
   (setf (alist-get 'tsx-ts-mode apheleia-mode-alist) '(prettier))
@@ -1214,8 +1232,19 @@ Supported values are `bottom' and `right'.")
   ;; https://github.com/radian-software/apheleia/issues/278
   (setf (alist-get 'rustfmt apheleia-formatters)
         '("rustfmt" "--edition" (or (bound-and-true-p rust-edition) "2024") "--quiet" "--emit" "stdout"))
-  ;; TODO: copied from apheleia-formatters for bash, generalize case.
-  (push '(zsh . ("shfmt" "-filename" filepath "-ln" (cl-case (bound-and-true-p sh-shell) (sh "posix") (t "zsh")) (when apheleia-formatters-respect-indent-level (format "--indent=%d" (cond (indent-tabs-mode 0) ((boundp 'sh-basic-offset) sh-basic-offset) (t 4)))) "-")) apheleia-formatters)
+  ;; TODO: copied from apheleia-formatters for bash; generalize this case.
+  (push '(zsh . ("shfmt"
+                 "-filename" filepath
+                 "-ln" (cl-case (bound-and-true-p sh-shell)
+                         (sh "posix")
+                         (t "zsh"))
+                 (when apheleia-formatters-respect-indent-level
+                   (format "--indent=%d"
+                           (cond (indent-tabs-mode 0)
+                                 ((boundp 'sh-basic-offset) sh-basic-offset)
+                                 (t 4))))
+                 "-"))
+        apheleia-formatters)
 
   :bind (:map format-prefix-map
               ("a" . apheleia-format-buffer)
@@ -1479,7 +1508,8 @@ To highlight indentations
     (when (derived-mode-p 'prog-mode)
       (indent-bars-mode 1)))
 
-  (add-hook 'tty-setup-hook (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
+  (add-hook 'tty-setup-hook
+            (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
 
   :custom
   (indent-bars-no-stipple-char ?│)
@@ -1942,7 +1972,8 @@ To highlight indentations
             (progn
               (setq-local fill-column column-limit)
               (display-fill-column-indicator-mode 1)
-              (when (called-interactively-p 'interactive) (message "fill-column set to %d from clang-format" column-limit)))
+              (when (called-interactively-p 'interactive)
+                (message "fill-column set to %d from clang-format" column-limit)))
           (user-error "clang-format ColumnLimit is 0"))
       (user-error "Could not determine clang-format ColumnLimit")))
 
@@ -2764,9 +2795,7 @@ terminals."
     "Call ORIG with Corfu tty child frames pinned to their parent terminal."
     (let ((make-frame-function (symbol-function #'make-frame)))
       (cl-letf (((symbol-function #'make-frame)
-                 (lambda (&optional params)
-                   (funcall make-frame-function
-                            (my/corfu-add-tty-child-frame-terminal params)))))
+                 (lambda (&optional params) (funcall make-frame-function (my/corfu-add-tty-child-frame-terminal params)))))
         (apply orig args))))
 
   (advice-remove #'corfu--make-frame
@@ -2811,7 +2840,7 @@ terminals."
 
 ** marginalia
 
-#+begin_src emacs-lisp :result silent
+#+begin_src emacs-lisp :results silent
 (use-package marginalia
   :elpaca t
   :demand t
@@ -2923,9 +2952,7 @@ maybe: https://github.com/casouri/eldoc-box
   (defun my/mlir-eglot-capf-setup ()
     "Use MLIR-aware Eglot completion bounds in MLIR buffers."
     (when (derived-mode-p 'mlir-mode)
-      (setq-local completion-at-point-functions
-                  (cons #'my/mlir-eglot-completion-at-point
-                        (remove #'eglot-completion-at-point completion-at-point-functions)))))
+      (setq-local completion-at-point-functions (cons #'my/mlir-eglot-completion-at-point (remove #'eglot-completion-at-point completion-at-point-functions)))))
 
   (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
@@ -2942,9 +2969,13 @@ maybe: https://github.com/casouri/eldoc-box
     (let (paths)
       (dolist (directory directories)
         (dolist (name names)
-          (let ((path (expand-file-name name directory))) (when (file-executable-p path) (push path paths)))))
+          (let ((path (expand-file-name name directory)))
+            (when (file-executable-p path)
+              (push path paths)))))
       (dolist (name names)
-        (let ((path (executable-find name))) (when path (push path paths))))
+        (let ((path (executable-find name)))
+          (when path
+            (push path paths))))
       (delete-dups (nreverse paths))))
 
   (defun my/clangd--compiler-names (clangd)
@@ -2953,7 +2984,9 @@ maybe: https://github.com/casouri/eldoc-box
       (dolist (path (my/clangd--path-variants clangd))
         (when (string-match "\\`clangd\\(.+\\)\\'" (file-name-nondirectory path))
           (let ((suffix (match-string 1 path)))
-            (setq names (append names (list (concat "clang" suffix) (concat "clang++" suffix)))))))
+            (setq names (append names
+                                (list (concat "clang" suffix)
+                                      (concat "clang++" suffix)))))))
       (delete-dups names)))
 
   (defun my/clangd-query-drivers (clangd)
@@ -2966,14 +2999,18 @@ to one of the discovered Clang drivers."
            (directories (delete-dups (mapcar #'file-name-directory clangd-paths)))
            (drivers (my/clangd--find-executables (my/clangd--compiler-names clangd) directories))
            (canonical-drivers (delete-dups (mapcar #'file-truename drivers)))
-           (aliases (delq nil (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
-                                      (my/clangd--find-executables '("cc" "c++") directories)))))
+           (aliases (delq nil
+                           (mapcar (lambda (path)
+                                     (when (member (file-truename path) canonical-drivers)
+                                       path))
+                                   (my/clangd--find-executables '("cc" "c++") directories)))))
       (delete-dups (apply #'append (mapcar #'my/clangd--path-variants (append drivers aliases))))))
 
   (defun my/eglot-clangd (&optional _interactive _project)
     "Return the generic, cross-platform clangd command for Eglot."
     (let* ((clangd (or (executable-find "clangd") "clangd"))
-           (drivers (and (file-executable-p clangd) (my/clangd-query-drivers clangd)))
+           (drivers (and (file-executable-p clangd)
+                         (my/clangd-query-drivers clangd)))
            (clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
       (append (list clangd)
               ;; `--query-driver' causes clangd to execute argv[0] from a compile command, so allow only explicit local Clang paths.
