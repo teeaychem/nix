@@ -1108,17 +1108,21 @@ Supported values are `bottom' and `right'.")
   (defvar-local my/mlir-opt-bin "mlir-opt")
 
   :config
-  (defun my/apheleia-copy-local-variable (variable buffer)
-    "Copy VARIABLE's buffer-local value from BUFFER into the current buffer."
-    (when (local-variable-p variable buffer)
-      (set (make-local-variable variable)
-           (buffer-local-value variable buffer))))
+  (defconst my/apheleia-region-context-variables
+    '(process-environment exec-path apheleia-formatter my/mlir-opt-bin)
+    "Buffer-local values a temporary region formatter must inherit.")
+
+  (defun my/apheleia-copy-local-variables (variables buffer)
+    "Copy buffer-local VARIABLES from BUFFER into the current buffer."
+    (dolist (variable variables)
+      (when (local-variable-p variable buffer)
+        (set (make-local-variable variable) (buffer-local-value variable buffer)))))
 
   (defun my/apheleia-format-region (beg end)
     "Format region between BEG and END using Apheleia's formatter for this mode."
     (interactive "r")
     (unless (use-region-p) (user-error "No active region"))
-    (when-let* ((err (apheleia--disallowed-p))) (user-error err))
+    (when-let ((err (apheleia--disallowed-p))) (user-error err))
     (let* ((source-buffer (current-buffer))
            (source-file buffer-file-name)
            (source-directory default-directory)
@@ -1127,53 +1131,46 @@ Supported values are `bottom' and `right'.")
            (source-beg (copy-marker beg))
            (source-end (copy-marker end t))
            (formatters (apheleia--get-formatters 'interactive))
-           (temp-buffer (generate-new-buffer " *apheleia-format-region*"))
-           done
-           format-error)
-      (unwind-protect
-          (condition-case quit
-              (progn
-                (with-current-buffer temp-buffer
-                  (insert-buffer-substring source-buffer beg end)
-                  (funcall source-mode)
-                  (setq-local buffer-file-name source-file)
-                  (setq-local default-directory source-directory)
-                  (my/apheleia-copy-local-variable 'apheleia-formatter source-buffer)
-                  (my/apheleia-copy-local-variable 'my/mlir-opt-bin source-buffer)
-                  (apheleia-format-buffer
-                   formatters
-                   nil
-                   :callback (lambda (&rest args) (setq format-error (plist-get args :error)) (setq done t))))
-                (while (not done)
-                  (let ((process (buffer-local-value 'apheleia--current-process
-                                                     temp-buffer)))
-                    (if (process-live-p process)
-                        (accept-process-output process 0.1)
-                      (accept-process-output nil 0.1))))
-                (unless format-error
-                  (let ((formatted (with-current-buffer temp-buffer
-                                     (buffer-string))))
-                    (if (/= source-tick (with-current-buffer source-buffer (buffer-chars-modified-tick)))
-                        (message "Apheleia region format skipped: buffer changed")
-                      (with-current-buffer source-buffer
-                        (delete-region source-beg source-end)
-                        (goto-char source-beg)
-                        (insert formatted))))))
-            (quit
+           (temp-buffer (generate-new-buffer " *apheleia-format-region*")))
+      (cl-labels
+          ((cleanup ()
+             (set-marker source-beg nil)
+             (set-marker source-end nil)
              (when (buffer-live-p temp-buffer)
-               (let ((process (buffer-local-value 'apheleia--current-process temp-buffer)))
-                 (when (process-live-p process)
-                   (process-put process :interrupted t)
-                   (interrupt-process process)
-                   (accept-process-output process 0.1 nil 'just-this-one)
-                   (when (process-live-p process) (kill-process process)))))
-             (signal (car quit) (cdr quit))))
-        (set-marker source-beg nil)
-        (set-marker source-end nil)
-        (when (buffer-live-p temp-buffer)
-          (with-current-buffer temp-buffer
-            (set-buffer-modified-p nil))
-          (kill-buffer temp-buffer)))))
+               (with-current-buffer temp-buffer (set-buffer-modified-p nil))
+               (kill-buffer temp-buffer)))
+           (applicable-p ()
+             (cond
+              ((not (buffer-live-p source-buffer)) (message "Apheleia format skipped: buffer killed"))
+              ((/= source-tick (with-current-buffer source-buffer (buffer-chars-modified-tick))) (message "Apheleia format skipped: buffer changed"))
+              (t t)))
+           (apply-result ()
+             (with-current-buffer source-buffer
+               (save-excursion
+                 (goto-char source-beg)
+                 (delete-region source-beg source-end)
+                 (insert (with-current-buffer temp-buffer (buffer-string)))))))
+        (condition-case err
+            (with-current-buffer temp-buffer
+              (insert-buffer-substring source-buffer beg end)
+              (let ((buffer-file-name source-file)
+                    (default-directory source-directory)
+                    (process-environment (buffer-local-value 'process-environment source-buffer))
+                    (exec-path (buffer-local-value 'exec-path source-buffer)))
+                (funcall source-mode))
+              (setq-local buffer-file-name source-file)
+              (setq-local default-directory source-directory)
+              (my/apheleia-copy-local-variables my/apheleia-region-context-variables source-buffer)
+              (apheleia-format-buffer formatters nil
+               :callback
+               (lambda (&rest args)
+                 (let ((format-error (plist-get args :error)))
+                   (unwind-protect
+                       (cond
+                        (format-error (message "Apheleia region format failed: %s" format-error))
+                        ((applicable-p) (apply-result)))
+                     (cleanup))))))
+          ((error quit) (cleanup) (signal (car err) (cdr err)))))))
 
   (defun my/python-apheleia-formatters ()
     (if (executable-find "yapf")
@@ -1554,8 +1551,7 @@ To highlight indentations
   :config
   (defun my/kkp-ignore-dead-delete-frame (orig-fun &optional frame &rest args)
     "Skip KKP frame teardown when FRAME has already been deleted."
-    (when (or (null frame) (frame-live-p frame))
-      (apply orig-fun frame args)))
+    (when (or (null frame) (frame-live-p frame)) (apply orig-fun frame args)))
 
   (advice-add #'kkp--pre-delete-frame :around #'my/kkp-ignore-dead-delete-frame)
 
