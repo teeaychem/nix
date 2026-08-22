@@ -487,8 +487,10 @@ Supported values are `bottom' and `right'.")
   :elpaca nil
 
   :init
-  (add-to-list 'completion-ignored-extensions ".DS_Store")
-  (add-to-list 'completion-ignored-extensions ".stow-local-ignore")
+  (dolist (extension '(".DS_Store"
+                       "__pycache__/"
+                       ".stow-local-ignore"))
+    (add-to-list 'completion-ignored-extensions extension))
 
   :bind
   (("s-s" . #'save-buffer)
@@ -925,6 +927,7 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp :results silent
 (use-package flymake
   :elpaca nil
+  :after eldoc
   :init
   (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
                                  "--stdin-filename=stdin" "-"))
@@ -938,27 +941,27 @@ Supported values are `bottom' and `right'.")
     (interactive (list 1 t))
     (flymake-goto-prev-error n '(error) interactive))
 
-  (defun my/flymake-diagnostics-at-point ()
-    "Show Flymake diagnostics at point in the echo area."
-    (when-let* ((diags (flymake-diagnostics (point))))
-      (message "%s"
-               (mapconcat
-                (lambda (diag)
-                  (flymake-diagnostic-text
-                   diag
-                   (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
-                       (alist-get t flymake-diagnostic-format-alist)
-                       '(origin code oneliner))))
-                          diags "\n"))))
+  (defun my/flymake-eldoc-function (_callback &rest _ignored)
+    "Return Flymake diagnostics at point for Eldoc."
+    (when-let* ((diagnostics (flymake-diagnostics (point))))
+      (mapconcat
+       (lambda (diagnostic)
+         (flymake-diagnostic-text
+          diagnostic
+          (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
+              (alist-get t flymake-diagnostic-format-alist)
+              '(origin code oneliner))))
+       diagnostics "\n")))
 
-  (defun my/flymake-diagnostics-at-point-setup ()
-    "Show Flymake diagnostics at point while Flymake is active."
+  (defun my/flymake-eldoc-setup ()
+    "Add Flymake diagnostics to Eldoc in the current buffer."
     (if flymake-mode
-        (add-hook 'post-command-hook  #'my/flymake-diagnostics-at-point nil t)
-      (remove-hook 'post-command-hook #'my/flymake-diagnostics-at-point t)))
+        (add-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t t)
+      (remove-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t)))
 
   :config
   (setq flymake-diagnostic-format-alist '((t . (origin code message))))
+
   :bind (:map goto-prefix-map
               :prefix "d"
               :prefix-map flymake-mode-prefix-map)
@@ -976,7 +979,7 @@ Supported values are `bottom' and `right'.")
   (flymake-wrap-around t)
 
   :hook
-  (flymake-mode . my/flymake-diagnostics-at-point-setup))
+  (flymake-mode . my/flymake-eldoc-setup))
 #+end_src
 
 ** project
