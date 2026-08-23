@@ -1,6 +1,6 @@
 # dotfiles
 
-GNU Stow deploys these packages into `$HOME`:
+Mise deploys the shared configuration and platform overlay into `$HOME`:
 
 - `common`: configuration and commands shared by all systems
 - `darwin`: macOS configuration and commands
@@ -51,13 +51,19 @@ Install the shared and Linux-specific Homebrew packages:
 brew bundle --file common/.config/brew/Brewfile
 ```
 
-Then apply the Stow links:
+Then apply the Mise-managed dotfiles:
 
 ```sh
-./install
+mise --cd ~/dotfiles bootstrap --only dotfiles
 ```
 
-Start a fresh Fish shell after linking the configuration.
+On the personal Mac, include the personal services configuration:
+
+```sh
+mise --cd ~/dotfiles --env personal bootstrap --only dotfiles
+```
+
+Start a fresh shell after linking the configuration.
 
 To use that Fish directly over SSH, without changing the remote login shell:
 
@@ -74,20 +80,17 @@ dotfiles-install
 Preview changes without creating links:
 
 ```sh
-dotfiles-install --simulate --verbose
+dotfiles-install --dry-run --verbose
 ```
 
-The installer uses `--no-folding`, allowing machine-local files to coexist
-with links managed by Stow.
+Mise deploys individual symlinks, allowing machine-local files to coexist in
+the same directories.
 
 After applying the dotfiles, the command is available as
 `install-apt-packages PACKAGE_FILE`.
 
-These package lists include Environment Modules (`modules` on Homebrew,
-`environment-modules` on Ubuntu), which Fish uses to load the shared, platform,
-and machine-local environment modulefiles. The platform module also sets
-`HOMEBREW_BUNDLE_FILE`, so after module initialization `brew bundle` uses the
-shared Brewfile by default.
+Mise provides the shared and platform-specific environment, including
+`HOMEBREW_BUNDLE_FILE`, after shell activation.
 
 For a fuller Homebrew install, use `common/.config/brew/Brewfile`, which
 includes the shared core bundle, shared optional bundle, and the current
@@ -113,7 +116,7 @@ Files such as the following should remain machine-local:
 ```text
 ~/.config/git/config.local
 ~/.config/ghostty/config.local
-~/.config/modules/modulefiles/dotfiles/local
+~/.config/mise/config.local.toml
 ```
 
 ## Update
@@ -136,7 +139,7 @@ dotfiles-config-ignore
 ```
 
 List files under `$XDG_CONFIG_HOME` that are neither matched by
-`config.ignore` nor symlinks managed by this Stow repository:
+`config.ignore` nor symlinks managed by this repository:
 
 ```sh
 dotfiles-config-audit
@@ -149,33 +152,29 @@ remain local or is generated state.
 
 ## Environment configuration
 
-Environment Modules provides shared, platform, and machine-local environment
-configuration:
+Mise provides shared, platform, and machine-local environment configuration:
 
 ```text
-~/.config/modules/modulefiles/dotfiles/base
-~/.config/modules/modulefiles/dotfiles/platform
-~/.config/modules/modulefiles/dotfiles/local
+~/dotfiles/mise/config.toml
+~/dotfiles/mise/config.macos.toml or config.linux.toml
+~/.config/mise/config.local.toml
 ```
 
-Shell startup loads `dotfiles/base`, `dotfiles/platform`, then the
-optional untracked `dotfiles/local` module. This gives machine-local values the
-highest priority.
+Mise loads the shared configuration and matching platform overlay automatically.
+The optional, untracked `config.local.toml` has the highest priority.
 
-Use `setenv` for baseline scalar values and the path commands for path-like
+Use `[env]` for baseline scalar values and `env._.path` for path-like
 variables:
 
-```tcl
-#%Module
+```toml
+[env]
+EDITOR = "nvim"
 
-setenv EDITOR nvim
-prepend-path PATH /opt/llvm/bin
+[env._]
+path = ["/opt/llvm/bin"]
 ```
 
-Use `pushenv` in temporary or overriding modules when unloading should restore
-the previous value.
-
 `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `XDG_DATA_HOME`, and `XDG_CACHE_HOME`
-remain shell bootstrap variables because they are needed before Modules is
+remain shell bootstrap variables because they are needed before Mise is
 initialized. Known unexported variable names used for completion remain in
 `~/.config/shell/vars/base.vars`.

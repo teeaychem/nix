@@ -1,0 +1,49 @@
+[env]
+XDG_DESKTOP_DIR = "{{env.HOME}}/Desktop"
+XDG_DOWNLOAD_DIR = "{{env.HOME}}/Downloads"
+XDG_TEMPLATES_DIR = "{{env.HOME}}/Templates"
+XDG_PUBLICSHARE_DIR = "{{env.HOME}}/Public"
+XDG_DOCUMENTS_DIR = "{{env.HOME}}/Documents"
+XDG_MUSIC_DIR = "{{env.HOME}}/Music"
+XDG_PICTURES_DIR = "{{env.HOME}}/Pictures"
+XDG_VIDEOS_DIR = "{{env.HOME}}/Videos"
+
+EDITOR = "nvim"
+PAGER = "less"
+LESS = "-RF"
+MANPAGER = "nvim +Man!"
+FD_OPTIONS = "--hidden --follow"
+FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git"
+
+NPM_CONFIG_USERCONFIG = "{{xdg_config_home}}/npm/npmrc"
+OPAMROOT = "{{xdg_data_home}}/opam"
+
+PYTHONPYCACHEPREFIX = "{{xdg_cache_home}}/python_cache"
+PYTHON_HISTORY = "{{xdg_state_home}}/python/history"
+IPYTHONDIR = "{{xdg_cache_home}}/ipython"
+MPLCONFIGDIR = "{{xdg_cache_home}}/matplotlib"
+
+DICTIONARY = "en_GB"
+DICPATH = "{{xdg_data_home}}/hunspell"
+LESSHISTFILE = "{{xdg_state_home}}/less/history"
+KERAS_HOME = "{{xdg_data_home}}/keras"
+ELAN_HOME = "{{env.HOME}}/.local/opt/elan"
+
+REPOS_DIR = "{{env.HOME}}/repos"
+LLVM_SRC = "{{env.HOME}}/repos/llvm"
+
+[env._]
+path = [
+  "{{env.HOME}}/.cargo/bin",
+  "{{env.HOME}}/.npm-packages/bin",
+  "{{env.HOME}}/.local/bin",
+  "{{env.ELAN_HOME}}/bin",
+]
+
+[dotfiles]
+"~" = { source = "../common", mode = "symlink-each", exclude = [".DS_Store", ".config/htop/htop_history"] }
+"~/.config/mise/config.toml" = { source = "config.toml", mode = "symlink" }
+"~/.config/mise/config.macos.toml" = { source = "config.macos.toml", mode = "symlink" }
+"~/.config/mise/config.linux.toml" = { source = "config.linux.toml", mode = "symlink" }
+"~/.config/mise/config.personal.toml" = { source = "config.personal.toml", mode = "symlink" }
+"~/.config/mise/miserc.toml" = { source = "../.miserc.toml", mode = "symlink" }

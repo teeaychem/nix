@@ -96,22 +96,7 @@ load_aliases "$XDG_CONFIG_HOME/shell/aliases/base.aliases"
 
 load_history_ignore "$XDG_CONFIG_HOME/shell/history/ignore"
 
-if test -r "$HOMEBREW_PREFIX/opt/modules/init/fish"
-    source "$HOMEBREW_PREFIX/opt/modules/init/fish"
-else
-    switch (uname)
-        case Linux
-            test -r /usr/share/modules/init/fish; and source /usr/share/modules/init/fish
-    end
-end
-
-if type -q module
-    module use "$XDG_CONFIG_HOME/modules/modulefiles"
-    module load dotfiles/base
-    module is-avail dotfiles/platform >/dev/null 2>&1; and module load dotfiles/platform
-
-    module is-avail dotfiles/local >/dev/null 2>&1; and module load dotfiles/local
-end
+mise activate fish | source
 
 switch (uname)
     case Darwin

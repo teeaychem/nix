@@ -1,0 +1,16 @@
+[env]
+HOMEBREW_BUNDLE_FILE = "{{xdg_config_home}}/brew/Brewfile"
+HOMEBREW_BAT = "1"
+HOMEBREW_NO_AUTO_UPDATE = "1"
+HOMEBREW_NO_ENV_HINTS = "1"
+
+[env._]
+path = [
+  "/opt/homebrew/sbin",
+  "/opt/homebrew/bin",
+  "/usr/local/texlive/2026basic/bin/universal-darwin",
+]
+
+[dotfiles]
+"~/.config" = { source = "../darwin/.config", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.local/bin" = { source = "../darwin/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }

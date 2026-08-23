@@ -67,24 +67,7 @@ export SAVEHIST=10000                # Maximum events in history file
 
 typeset -gU path fpath # ensure path arrays do not contain duplicates.
 
-if [[ -r "${HOMEBREW_PREFIX:-}/opt/modules/init/zsh" ]]; then
-    source "${HOMEBREW_PREFIX:-}/opt/modules/init/zsh"
-elif [[ "$OSTYPE" == linux* && -r /usr/share/modules/init/zsh ]]; then
-    source /usr/share/modules/init/zsh
-fi
-
-if (( $+functions[module] )); then
-    module use "$XDG_CONFIG_HOME/modules/modulefiles"
-    module load dotfiles/base
-
-    if module is-avail dotfiles/platform >/dev/null 2>&1; then
-        module load dotfiles/platform
-    fi
-
-    if module is-avail dotfiles/local >/dev/null 2>&1; then
-        module load dotfiles/local
-    fi
-fi
+eval "$(mise activate zsh)"
 
 # # gpg
 

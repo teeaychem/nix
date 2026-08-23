@@ -75,8 +75,8 @@
 (setq vc-follow-symlinks t)
 
 ;; Load the tangle, regenerating it under `user-emacs-directory' when needed.
-;; `config.org' is managed by Stow and may be a symlink into the dotfiles
-;; checkout; keep the generated `config.el' outside the repository.
+;; `config.org' is deployed as a symlink into the dotfiles checkout; keep the
+;; generated `config.el' outside the repository.
 (require 'ob-tangle)
 (let ((config-org (expand-file-name "config.org" user-emacs-directory))
       (config-el (expand-file-name "config.el" user-emacs-directory)))

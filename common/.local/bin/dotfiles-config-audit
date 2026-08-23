@@ -76,4 +76,4 @@ while IFS= read -r relative_path; do
     count=$((count + 1))
 done < "$listing"
 
-printf '\n%d potential Stow candidate(s).\n' "$count"
+printf '\n%d potential dotfile candidate(s).\n' "$count"

@@ -309,7 +309,6 @@ than waiting for a file-notification event."
   (dired-omit-files (concat "\\`[.]\\'"
                             "\\|\\.\\(?:elc\\|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
                             "\\|^\\.DS_Store\\'"
-                            "\\|^\\.stow-local-ignore\\'"
                             "\\|^\\.\\(?:svn\\|git\\)\\'"
                             "\\|^__pycache__\\'"
                             "\\|^flymake_.*"))
@@ -486,8 +485,7 @@ Supported values are `bottom' and `right'.")
 
   :init
   (dolist (extension '(".DS_Store"
-                       "__pycache__/"
-                       ".stow-local-ignore"))
+                       "__pycache__/"))
     (add-to-list 'completion-ignored-extensions extension))
 
   :bind
