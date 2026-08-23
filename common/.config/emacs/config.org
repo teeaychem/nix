@@ -26,9 +26,19 @@ https://www.emacswiki.org/emacs/GnusAuthinfo
 
 * to investigate
 
-https://github.com/pierre-rouleau/pel
 https://whhone.com/emacs-config/
 https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
+
+
+* prerequisites
+
+** delight
+
+#+begin_src emacs-lisp
+(use-package delight
+  :elpaca (:wait t)
+  :demand t)
+#+end_src
 
 
 * general
@@ -65,7 +75,6 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   :custom
   (user-full-name "bsparkes")
-  (user-mail-address "bsparkes@alumni.stanford.edu")
   (require-final-newline t)
   (echo-keystrokes 0.1) ;; turn down time to echo keystrokes so no waiting for things to happen.
   (sentence-end-double-space nil)
@@ -338,8 +347,7 @@ than waiting for a file-notification event."
   :after eglot
 
   :config
-  (advice-add #'eglot-signature-eldoc-function
-              :override #'eglot-signature-eldoc-talkative))
+  (advice-add #'eglot-signature-eldoc-function :override #'eglot-signature-eldoc-talkative))
 #+end_src
 
 *** eldoc
@@ -356,33 +364,24 @@ than waiting for a file-notification event."
 Supported values are `bottom' and `right'.")
 
   (defun my/eldoc-display-buffer (buffer alist)
-    "Display Eldoc BUFFER according to `my/eldoc-window-side'."
+    "Display Eldoc BUFFER in the configured side window."
     (let* ((side my/eldoc-window-side)
-           (size (if (eq side 'bottom)
-                     8
-                   (min 80 (max 1 (/ (frame-width) 3)))))
-           (action-alist (append `((side . ,side)
-                                   (slot . 0)
-                                   ,(if (eq side 'bottom) `(window-height . ,size) `(window-width . ,size)))
-                                 alist))
-           (window (or (display-buffer-reuse-window buffer action-alist)
-                       (let ((window-sides-vertical nil))
-                         (display-buffer-in-side-window buffer action-alist)))))
-      (when (window-live-p window)
-        (ignore-errors
-          (window-resize window
-                         (- size (if (eq side 'bottom)
-                                     (window-total-height window)
-                                   (window-total-width window)))
-                         (not (eq side 'bottom))
-                         'safe)))
-      window))
+           (bottomp (eq side 'bottom))
+           (size (cond
+                  (bottomp 8)
+                  (t (min 80 (max 1 (/ (frame-width) 3))))))
+           (dimension (if bottomp 'window-height 'window-width)))
+      (display-buffer-in-side-window
+       buffer
+       (append `((side . ,side)
+                 (slot . 0)
+                 (,dimension . ,size))
+               alist))))
 
   (defun my/eldoc-quit-doc-buffer ()
     "Close the displayed Eldoc documentation window."
     (interactive)
-    (when-let* ((window (and (buffer-live-p eldoc--doc-buffer)
-                             (get-buffer-window eldoc--doc-buffer t))))
+    (when-let* ((window (and (buffer-live-p eldoc--doc-buffer) (get-buffer-window eldoc--doc-buffer t))))
       (quit-window nil window)))
 
   (defun my/eldoc-toggle-doc-buffer ()
@@ -396,9 +395,8 @@ Supported values are `bottom' and `right'.")
     "Toggle the Eldoc window between the bottom and right side."
     (interactive)
     (setq my/eldoc-window-side (if (eq my/eldoc-window-side 'bottom) 'right 'bottom))
-    (when-let* ((buffer (get-buffer "*eldoc*")))
-      (when-let* ((window (get-buffer-window buffer t)))
-        (delete-window window))
+    (when-let ((buffer (get-buffer "*eldoc*")))
+      (when-let ((window (get-buffer-window buffer t))) (delete-window window))
       (display-buffer buffer))
     (message "Eldoc window: %s" my/eldoc-window-side))
 
@@ -559,7 +557,6 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package ispell
   :after exec-path-from-shell
-
   :if (executable-find "hunspell")
 
   :custom
@@ -654,6 +651,8 @@ Supported values are `bottom' and `right'.")
 
 #+begin_src emacs-lisp
 (use-package savehist
+  :elpaca nil
+
   :custom
   (savehist-file  (concat user-emacs-directory "var/savehist"))
   (savehist-additional-variables
@@ -928,6 +927,7 @@ Supported values are `bottom' and `right'.")
 (use-package flymake
   :elpaca nil
   :after eldoc
+
   :init
   (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
                                  "--stdin-filename=stdin" "-"))
@@ -948,9 +948,7 @@ Supported values are `bottom' and `right'.")
        (lambda (diagnostic)
          (flymake-diagnostic-text
           diagnostic
-          (or (alist-get :eldoc-echo flymake-diagnostic-format-alist)
-              (alist-get t flymake-diagnostic-format-alist)
-              '(origin code oneliner))))
+          (or (alist-get :eldoc-echo flymake-diagnostic-format-alist) (alist-get t flymake-diagnostic-format-alist) '(origin code oneliner))))
        diagnostics "\n")))
 
   (defun my/flymake-eldoc-setup ()
@@ -1017,8 +1015,7 @@ Supported values are `bottom' and `right'.")
          (file-org (expand-file-name (concat name ".org") user-emacs-directory)))
     (if (file-exists-p file-org)
         (progn
-          (when (file-newer-than-file-p file-org file-el)
-            (org-babel-tangle-file file-org file-el "emacs-lisp"))
+          (when (file-newer-than-file-p file-org file-el) (org-babel-tangle-file file-org file-el "emacs-lisp"))
           (load file-el nil 'nomessage))
       (message (concat "Did not find " file-org)))))
 #+end_src
@@ -1176,10 +1173,8 @@ Supported values are `bottom' and `right'.")
     (if (executable-find "yapf")
         '(my-yapf ruff-isort)
       '(ruff-isort my-ruff)))
-  (setf (alist-get 'my-yapf apheleia-formatters)
-        '("yapf" "--style" "{column_limit: 320}" "-"))
-  (setf (alist-get 'my-ruff apheleia-formatters)
-        '("ruff" "format" "--silent" "--line-length" "320" "--stdin-filename" filepath "-"))
+  (setf (alist-get 'my-yapf apheleia-formatters) '("yapf" "--style" "{column_limit: 320}" "-"))
+  (setf (alist-get 'my-ruff apheleia-formatters) '("ruff" "format" "--silent" "--line-length" "320" "--stdin-filename" filepath "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist) (my/python-apheleia-formatters))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) (my/python-apheleia-formatters))
   (setf (alist-get 'js-ts-mode apheleia-mode-alist) '(prettier))
@@ -1197,8 +1192,7 @@ Supported values are `bottom' and `right'.")
     (when-let* ((root (locate-dominating-file default-directory ".gersemirc")))
       (list "--config" (expand-file-name ".gersemirc" root))))
 
-  (setf (alist-get 'gersemi apheleia-formatters)
-        '("gersemi" (my/gersemi-config-arguments) "-"))
+  (setf (alist-get 'gersemi apheleia-formatters) '("gersemi" (my/gersemi-config-arguments) "-"))
   (setf (alist-get 'cmake-ts-mode apheleia-mode-alist) '(gersemi))
 
   (push '(raco-fmt . ("raco" "fmt")) apheleia-formatters)
@@ -1295,13 +1289,6 @@ Supported values are `bottom' and `right'.")
   :elpaca t)
 #+end_src
 
-** delight
-
-#+begin_src emacs-lisp
-(use-package delight
-  :elpaca t)
-#+end_src
-
 ** dirvish
 
 #+begin_src emacs-lisp
@@ -1354,7 +1341,6 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package dumb-jump
   :elpaca t
-
   :defer t
 
   :custom
@@ -1410,7 +1396,6 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package ghostel
   :elpaca (:repo "https://github.com/dakra/ghostel" :files ("lisp/*.el"))
-
   :defer t
 
   :custom
@@ -1435,7 +1420,6 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package consult-gumshoe
   :elpaca (consult-gumshoe :type git :host github :repo "Overdr0ne/gumshoe" :files ("extensions/consult-gumshoe/consult-gumshoe.el"))
-
   :after (consult gumshoe)
 
   :bind (:map goto-prefix-map
@@ -1447,12 +1431,14 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package helpful
   :elpaca t
+
   :bind
   ([remap describe-command] . helpful-command)
   ([remap describe-function] . helpful-callable)
   ([remap describe-key] . helpful-key)
   ([remap describe-symbol] . helpful-symbol)
   ([remap describe-variable] . helpful-variable)
+
   :custom
   (helpful-max-buffers 7))
 #+end_src
@@ -1473,6 +1459,7 @@ To highlight indentations
   (highlight-indent-guides-auto-odd-face-perc 75)
   (highlight-indent-guides-auto-even-face-perc 75)
   (highlight-indent-guides-auto-character-face-perc 80)
+
   :hook
   (prog-mode . highlight-indent-guides-mode))
 #+end_src
@@ -1486,11 +1473,9 @@ To highlight indentations
   :config
   (defun my/safe-enable-indent-bars ()
     "Safely activate indent-bars only in active code buffers."
-    (when (derived-mode-p 'prog-mode)
-      (indent-bars-mode 1)))
+    (when (derived-mode-p 'prog-mode) (indent-bars-mode 1)))
 
-  (add-hook 'tty-setup-hook
-            (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
+  (add-hook 'tty-setup-hook (lambda () (dolist (buf (buffer-list)) (with-current-buffer buf (my/safe-enable-indent-bars)))))
 
   :custom
   (indent-bars-no-stipple-char ?│)
@@ -1684,6 +1669,7 @@ To highlight indentations
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :elpaca t
+
   :hook
   (prog-mode . rainbow-delimiters-mode))
 #+end_src
@@ -2157,19 +2143,15 @@ Signal a user error when neither names an executable."
   "LLVM repository paths needed for Emacs Lisp modes.")
 
 (defconst my/elpaca-llvm-source-steps
-  '(my/elpaca-git-sparse-clone elpaca-git--configure-remotes elpaca-git--checkout-ref my/elpaca-llvm-sparse-checkout)
+  '(my/elpaca-llvm-sparse-clone elpaca-git--configure-remotes elpaca-git--checkout-ref my/elpaca-llvm-sparse-checkout)
   "Elpaca source steps for LLVM sparse checkout.")
 
-(defun my/elpaca-git-sparse-clone (e)
+(defun my/elpaca-llvm-sparse-clone (e)
   "Clone E using Git partial clone and sparse checkout."
   (let* ((recipe (elpaca<-recipe e))
          (repo-dir (elpaca<-source-dir e))
          (default-directory elpaca-directory)
-         (command `("git" "clone"
-                    "--filter=tree:0"
-                    "--sparse"
-                    ,(elpaca-git--repo-uri recipe)
-                    ,repo-dir)))
+         (command `("git" "clone" "--filter=tree:0" "--sparse" ,(elpaca-git--repo-uri recipe) ,repo-dir)))
     (if (file-exists-p repo-dir)
         (progn
           (elpaca-note e (format "%s exists. Skipping clone." repo-dir))
@@ -2693,11 +2675,7 @@ These buffers can be seen by using space.
      :face 'consult-buffer
      :history 'buffer-name-history
      :state #'consult--buffer-state
-     :items (lambda ()
-              (consult--buffer-query
-               :mode modes
-               :exclude consult-buffer-filter
-               :as #'buffer-name))))
+     :items (lambda () (consult--buffer-query :mode modes :exclude consult-buffer-filter :as #'buffer-name))))
 
   ;; Keep repeated evaluation from appending duplicate custom sources.
   (dolist (source my/consult-mode-buffer-sources)
@@ -2715,8 +2693,7 @@ These buffers can be seen by using space.
                   ("TableGen" (tablegen-mode) (?G . "TableGen"))
                   ("TeX" (latex-mode LaTeX-mode tex-mode TeX-mode) (?T . "TeX")))))
 
-  (setq consult-buffer-sources
-        (append consult-buffer-sources my/consult-mode-buffer-sources)))
+  (setq consult-buffer-sources (append consult-buffer-sources my/consult-mode-buffer-sources)))
 #+end_src
 
 *** consult-dir
@@ -2844,11 +2821,10 @@ terminals."
   :demand t
 
   :custom
+  ;; (completion-category-overrides '((file (styles partial-completion))))
   (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
-  (completion-category-overrides nil)
-  ;; (completion-category-overrides '((file (styles partial-completion))))
-  )
+  (completion-category-overrides nil))
 #+end_src
 
 ** vertico
@@ -2923,10 +2899,7 @@ maybe: https://github.com/casouri/eldoc-box
     (when-let* ((capf (eglot-completion-at-point)))
       (pcase-let ((`(,beg ,end ,table . ,props) capf))
         (let ((new-beg beg))
-          (save-excursion
-            (goto-char (point))
-            (when (search-backward "." beg t)
-              (setq new-beg (1+ (point)))))
+          (save-excursion (goto-char (point)) (when (search-backward "." beg t) (setq new-beg (1+ (point)))))
           `(,new-beg ,end ,table ,@props)))))
 
   (defun my/mlir-eglot-capf-setup ()
@@ -2950,12 +2923,10 @@ maybe: https://github.com/casouri/eldoc-box
       (dolist (directory directories)
         (dolist (name names)
           (let ((path (expand-file-name name directory)))
-            (when (file-executable-p path)
-              (push path paths)))))
+            (when (file-executable-p path) (push path paths)))))
       (dolist (name names)
         (let ((path (executable-find name)))
-          (when path
-            (push path paths))))
+          (when path (push path paths))))
       (delete-dups (nreverse paths))))
 
   (defun my/clangd--compiler-names (clangd)
@@ -2980,17 +2951,14 @@ to one of the discovered Clang drivers."
            (drivers (my/clangd--find-executables (my/clangd--compiler-names clangd) directories))
            (canonical-drivers (delete-dups (mapcar #'file-truename drivers)))
            (aliases (delq nil
-                           (mapcar (lambda (path)
-                                     (when (member (file-truename path) canonical-drivers)
-                                       path))
+                           (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
                                    (my/clangd--find-executables '("cc" "c++") directories)))))
       (delete-dups (apply #'append (mapcar #'my/clangd--path-variants (append drivers aliases))))))
 
   (defun my/eglot-clangd (&optional _interactive _project)
     "Return the generic, cross-platform clangd command for Eglot."
     (let* ((clangd (or (executable-find "clangd") "clangd"))
-           (drivers (and (file-executable-p clangd)
-                         (my/clangd-query-drivers clangd)))
+           (drivers (and (file-executable-p clangd) (my/clangd-query-drivers clangd)))
            (clangd-jobs (or (getenv "CLANGD_JOBS") "8")))
       (append (list clangd)
               ;; `--query-driver' causes clangd to execute argv[0] from a compile command, so allow only explicit local Clang paths.
@@ -3101,7 +3069,6 @@ for rust dev
 #+begin_src emacs-lisp
 (use-package eglot-x
   :disabled
-  :if (memq system-type '(darwin))
   :elpaca (eglot-x :repo "https://github.com/nemethf/eglot-x")
   :after eglot
 
