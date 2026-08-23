@@ -66,27 +66,43 @@ setopt EXTENDED_HISTORY # record timestamp of command
 
 typeset -ga history_ignore_patterns
 history_ignore_patterns=()
+typeset -g pending_history_entry
 
 while IFS= read -r pattern || [[ -n "$pattern" ]]; do
     [[ "$pattern" =~ '^[[:space:]]*(#|$)' ]] && continue
     history_ignore_patterns+=("$pattern")
 done < "$XDG_CONFIG_HOME/shell/history/ignore"
 
-function _ignore_history() {
+function _defer_history_entry() {
     emulate -L zsh
 
     local command="${1%%$'\n'}"
     local pattern
 
+    pending_history_entry=
+
     for pattern in "${history_ignore_patterns[@]}"; do
         [[ "$command" =~ "$pattern" ]] && return 1
     done
 
-    return 0
+    pending_history_entry="$command"
+    return 1
+}
+
+function _save_successful_history() {
+    local exit_status=$?
+    local command="$pending_history_entry"
+
+    pending_history_entry=
+
+    if (( exit_status == 0 )) && [[ -n "$command" ]]; then
+        print -sr -- "$command"
+    fi
 }
 
 autoload -Uz add-zsh-hook
-add-zsh-hook zshaddhistory _ignore_history
+add-zsh-hook zshaddhistory _defer_history_entry
+add-zsh-hook precmd _save_successful_history
 
 # # # corrections
 # setopt CORRECT
