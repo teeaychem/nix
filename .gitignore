@@ -25,9 +25,9 @@
 /emacs/undo-tree/*
 /emacs/var/*
 
-/common/.config/emacs/config*.el*
-/common/.config/emacs/eln-cache/**
-/common/.config/emacs/elpaca
+/home/.config/emacs/config*.el*
+/home/.config/emacs/eln-cache/**
+/home/.config/emacs/elpaca
 
 /fish/fish_variables
 /fish/functions/_autopair_*.fish

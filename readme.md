@@ -1,10 +1,11 @@
 # dotfiles
 
-Mise deploys the shared configuration and platform overlay into `$HOME`:
+Mise deploys the shared home configuration and platform overlays into `$HOME`:
 
-- `common`: configuration and commands shared by all systems
+- `home`: configuration and commands shared by all systems
 - `darwin`: macOS configuration and commands
 - `linux`: Linux configuration
+- `personal`: services and LaunchAgents for the personal Mac
 
 
 ## Utils
@@ -28,13 +29,13 @@ cd ~/dotfiles
 On macOS, use the core Homebrew bundle:
 
 ```sh
-brew bundle --file common/.config/brew/Brewfile.core
+brew bundle --file home/.config/brew/Brewfile.core
 ```
 
 On Ubuntu, install Homebrew's bootstrap dependencies:
 
 ```sh
-./linux/.local/bin/install-apt-packages common/.config/apt/packages
+./linux/.local/bin/install-apt-packages home/.config/apt/packages
 ```
 
 Install Homebrew at its standard Linux prefix, then load it into the current
@@ -48,7 +49,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 Install the shared and Linux-specific Homebrew packages:
 
 ```sh
-brew bundle --file common/.config/brew/Brewfile
+brew bundle --file home/.config/brew/Brewfile
 ```
 
 Then apply the Mise-managed dotfiles:
@@ -92,7 +93,7 @@ After applying the dotfiles, the command is available as
 Mise provides the shared and platform-specific environment, including
 `HOMEBREW_BUNDLE_FILE`, after shell activation.
 
-For a fuller Homebrew install, use `common/.config/brew/Brewfile`, which
+For a fuller Homebrew install, use `home/.config/brew/Brewfile`, which
 includes the shared core bundle, shared optional bundle, and the current
 platform bundle.
 
@@ -155,8 +156,9 @@ remain local or is generated state.
 Mise provides shared, platform, and machine-local environment configuration:
 
 ```text
-~/dotfiles/mise/config.toml
-~/dotfiles/mise/config.macos.toml or config.linux.toml
+~/dotfiles/mise.toml
+~/dotfiles/mise.macos.toml or mise.linux.toml
+~/dotfiles/.miserc.toml
 ~/.config/mise/config.local.toml
 ```
 

@@ -40,7 +40,7 @@ if ! command -v rsync >/dev/null 2>&1; then
     exit 1
 fi
 
-"$repo_dir/scripts/.local/bin/dotfiles-config-ignore" "$ignore_file"
+"$repo_dir/home/.local/bin/dotfiles-config-ignore" "$ignore_file"
 
 temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/config-audit.XXXXXXXX")
 listing="$temporary_directory/listing"

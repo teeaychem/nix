@@ -11,4 +11,4 @@ path = [
 ]
 
 [dotfiles]
-"~/.local/bin" = { source = "../linux/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }
+"~/.local/bin" = { source = "linux/.local/bin", mode = "symlink-each", exclude = [".DS_Store"] }
