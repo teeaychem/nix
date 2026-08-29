@@ -41,7 +41,7 @@ path = [
 ]
 
 [dotfiles]
-"~" = { source = "home", mode = "symlink-each", exclude = [".DS_Store", ".config/htop/htop_history"] }
+"~" = { source = "shared", mode = "symlink-each", exclude = [".DS_Store", ".config/htop/htop_history"] }
 "~/.config/mise/config.toml" = { source = "mise.toml", mode = "symlink" }
 "~/.config/mise/config.macos.toml" = { source = "mise.macos.toml", mode = "symlink" }
 "~/.config/mise/config.linux.toml" = { source = "mise.linux.toml", mode = "symlink" }
