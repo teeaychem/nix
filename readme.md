@@ -1,172 +1,87 @@
 # dotfiles
 
-Mise deploys the shared home configuration and platform overlays into `$HOME`:
+## Install packages
 
-- `home`: configuration and commands shared by all systems
-- `darwin`: macOS configuration and commands
-- `linux`: Linux configuration
-- `personal`: services and LaunchAgents for the personal Mac
-
-
-## Utils
-
-### Fish
-
-``` sh
-fish_plugins_sync
-```
-
-## Install
-
-Clone the repository, install the platform package set, then apply the
-configuration:
+Choose the core package set or the full package set. The full bundle includes
+the core, optional, and current-platform bundles, so these are alternatives:
 
 ```sh
-git clone ssh://git@codeberg.org/teeaychem/dot.git ~/dotfiles
-cd ~/dotfiles
+# Small shared baseline.
+brew bundle --file ~/dotfiles/shared/.config/brew/Brewfile.core
+
+# Full package set for the current platform.
+brew bundle --file ~/dotfiles/shared/.config/brew/Brewfile
 ```
 
-On macOS, use the core Homebrew bundle:
+On Ubuntu:
 
 ```sh
-brew bundle --file home/.config/brew/Brewfile.core
+~/dotfiles/linux/.local/bin/install-apt-packages ~/dotfiles/shared/.config/apt/packages
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+brew bundle --file ~/dotfiles/shared/.config/brew/Brewfile
 ```
 
-On Ubuntu, install Homebrew's bootstrap dependencies:
+## Deploy configuration with Mise
+
+Mise deploys configuration into `$HOME` and loads the shared and platform-specific environment.
 
 ```sh
-./linux/.local/bin/install-apt-packages home/.config/apt/packages
+mise trust ~/dotfiles/mise.toml
+mise --cd ~/dotfiles bootstrap dotfiles apply
 ```
 
-Install Homebrew at its standard Linux prefix, then load it into the current
-shell:
+Use the personal overlay only where its local services are wanted:
 
 ```sh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+mise --cd ~/dotfiles --env personal bootstrap dotfiles apply
 ```
 
-Install the shared and Linux-specific Homebrew packages:
+Deployment is idempotent and uses individual symlinks, so a managed directory can also contain machine-local files.
+Check the result or preview a change with:
 
 ```sh
-brew bundle --file home/.config/brew/Brewfile
+mise --cd ~/dotfiles bootstrap dotfiles status
+mise --cd ~/dotfiles bootstrap --only dotfiles --dry-run
 ```
 
-Then apply the Mise-managed dotfiles:
-
-```sh
-mise --cd ~/dotfiles bootstrap --only dotfiles
-```
-
-On the personal Mac, include the personal services configuration:
-
-```sh
-mise --cd ~/dotfiles --env personal bootstrap --only dotfiles
-```
-
-Start a fresh shell after linking the configuration.
-
-To use that Fish directly over SSH, without changing the remote login shell:
-
-```sh
-ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
-```
-
-After the first install, the wrapper command is available from any directory:
+After the first deployment, the linked `dotfiles-install` command applies the same dotfiles-only operation from any directory:
 
 ```sh
 dotfiles-install
-```
-
-Preview changes without creating links:
-
-```sh
 dotfiles-install --dry-run --verbose
 ```
 
-Mise deploys individual symlinks, allowing machine-local files to coexist in
-the same directories.
+Links reflect ordinary repository edits and pulls immediately; run deployment again only after paths have been added, removed, or moved.
+Start a fresh shell after the first deployment so Mise activation is available.
 
-After applying the dotfiles, the command is available as
-`install-apt-packages PACKAGE_FILE`.
-
-Mise provides the shared and platform-specific environment, including
-`HOMEBREW_BUNDLE_FILE`, after shell activation.
-
-For a fuller Homebrew install, use `home/.config/brew/Brewfile`, which
-includes the shared core bundle, shared optional bundle, and the current
-platform bundle.
-
-## Debugging
-
-The Homebrew and Ubuntu package lists install GDB and LLVM's LLDB adapter.
-`~/.local/bin/lldb-dap` resolves Homebrew's keg-only LLVM installation and
-Ubuntu's versioned adapter names.
-
-Pet runs debugpy with the Python interpreter selected for the current project,
-so debugpy must also be present in that environment. For uv projects:
+For a repository update that may change the deployed path layout:
 
 ```sh
-uv add --dev debugpy
-```
-
-## Machine-local files
-
-Files such as the following should remain machine-local:
-
-```text
-~/.config/git/config.local
-~/.config/ghostty/config.local
-~/.config/mise/config.local.toml
-```
-
-## Update
-
-Existing links follow repository updates immediately. Run the installer after
-files are added, removed, or moved:
-
-```sh
-cd ~/dotfiles
-git pull
+git -C ~/dotfiles pull
 dotfiles-install
 ```
 
-## Audit
+## Use the environment
 
-Generate `config.ignore` from the preserved `.gitignore` patterns:
-
-```sh
-dotfiles-config-ignore
-```
-
-List files under `$XDG_CONFIG_HOME` that are neither matched by
-`config.ignore` nor symlinks managed by this repository:
+Mise loads `mise.toml` and the matching `mise.macos.toml` or `mise.linux.toml` automatically.
+It provides the shared variables, platform paths, and `HOMEBREW_BUNDLE_FILE`; after shell activation this works without a
+`--file` argument:
 
 ```sh
-dotfiles-config-audit
+brew bundle
 ```
 
-The result is a review list, not an instruction to move every reported file.
-It can include current machine-local files whose long-term placement remains
-undecided. Update `.gitignore` and regenerate after deciding a path should
-remain local or is generated state.
+`--env personal` selects the opt-in personal overlay and composes with the deployment commands above.
 
-## Environment configuration
-
-Mise provides shared, platform, and machine-local environment configuration:
+Keep machine-specific values in the untracked, highest-priority layer:
 
 ```text
-~/dotfiles/mise.toml
-~/dotfiles/mise.macos.toml or mise.linux.toml
-~/dotfiles/.miserc.toml
 ~/.config/mise/config.local.toml
 ```
 
-Mise loads the shared configuration and matching platform overlay automatically.
-The optional, untracked `config.local.toml` has the highest priority.
-
-Use `[env]` for baseline scalar values and `env._.path` for path-like
-variables:
+For example:
 
 ```toml
 [env]
@@ -176,7 +91,33 @@ EDITOR = "nvim"
 path = ["/opt/llvm/bin"]
 ```
 
-`XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `XDG_DATA_HOME`, and `XDG_CACHE_HOME`
-remain shell bootstrap variables because they are needed before Mise is
-initialized. Known unexported variable names used for completion remain in
-`~/.config/shell/vars/base.vars`.
+Other local configuration can coexist beside managed files:
+
+```text
+~/.config/git/config.local
+~/.config/ghostty/config.local
+```
+
+## Use debugging tools
+
+The package lists provide GDB and an LLVM LLDB adapter.
+`~/.local/bin/lldb-dap` resolves Homebrew's keg-only LLVM installation and Ubuntu's versioned adapter names.
+
+Pet uses the Python interpreter selected for the project, so install debugpy in that environment.
+For a uv project:
+
+```sh
+uv add --dev debugpy
+```
+
+Synchronise Fish plugins when their declared set changes:
+
+```sh
+fish_plugins_sync
+```
+
+To use the configured Fish directly over SSH without changing the remote login shell:
+
+```sh
+ssh -t HOST '/home/linuxbrew/.linuxbrew/bin/fish -l'
+```
