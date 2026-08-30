@@ -3265,53 +3265,6 @@ See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
 #+end_src
 
 
-* llm
-
-
-** gptel
-
-#+begin_src emacs-lisp
-(use-package gptel
-  :elpaca t
-  :bind (:prefix-map gptel-prefix-map
-                     :prefix "C-c z")
-  :bind (:map gptel-prefix-map
-              ("a" . gptel-add)
-              ("c"  . gptel)
-              ("r" . gptel-rewrite)
-              ("m"  . gptel-menu)
-              ("p" . gptel-preset)
-              ("s" . gptel-send)
-              ("t"  . gptel-tools)
-              ("v"  . gptel-context-visit))
-
-  :config
-  (gptel-make-openai "llama-cpp"
-    :stream t
-    :protocol "http"
-    :host "localhost:8080"
-    :models '(llama-model))
-
-  (gptel-make-preset 'explain
-    :system "Explain what this code does to a novice programmer.")
-
-  (setq-default gptel-include-reasoning nil)
-  (setq-default gptel-log-level 'info)
-  (setq-default gptel-cache t))
-#+end_src
-
-** gptel-agent
-
-#+begin_src emacs-lisp
-(use-package gptel-agent
-  :elpaca t
-
-  :defer t
-
-  :config (gptel-agent-update))         ;Read files from agents directories
-#+end_src
-
-
 * COMMENT profiling-end
 
 #+begin_src emacs-lisp
