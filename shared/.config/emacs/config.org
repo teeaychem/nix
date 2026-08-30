@@ -902,8 +902,8 @@ Supported values are `bottom' and `right'.")
          ("l"         . display-line-numbers-mode))
 
   :custom
-  (split-height-threshold 0) ; Prefer side-by-side automatic splits.
-  (split-width-threshold nil))
+  (split-height-threshold nil) ; Avoid top/bottom splits.
+  (split-width-threshold 0))   ; Prefer side-by-side splits.
 #+end_src
 
 ** winner
@@ -2360,22 +2360,13 @@ https://robert.kra.hn/posts/rust-emacs-setup/
 ** markdown
 
 #+begin_src emacs-lisp
-(use-package markdown-mode
-  :elpaca t
-  :mode (("/README\\(?:\\.md\\)?\\'" . gfm-mode)
-         ("\\.m[k]d\\'" . gfm-mode))
+(use-package markdown-ts-mode
+  :elpaca nil
+  :mode (("/README\\(?:\\.md\\)?\\'" . markdown-ts-mode)
+         ("\\.m[k]d\\'" . markdown-ts-mode))
 
-  :bind
-  (:map markdown-mode-map
-        ("M-<left>" . markdown-promote)
-        ("M-<right>" . markdown-demote)
-        ("M-S-<left>" . markdown-promote-subtree)
-        ("M-S-<right>" . markdown-demote-subtree))
-
-  :config
-  (setq markdown-fontify-code-blocks-natively t)
-  (setq markdown-header-scaling t)
-  (setq-default markdown-enable-math t))
+  :custom
+  (markdown-ts-fontify-code-blocks-natively t))
 #+end_src
 
 ** math-preview
@@ -2532,9 +2523,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   ;;(add-to-list 'completion-at-point-functions #'cape-history)
   ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
   ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
   ;;(add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
 
   :bind (:prefix-map cape-prefix-map :prefix "C-c p")
   (:map cape-prefix-map
@@ -3150,6 +3139,7 @@ https://github.com/renzmann/treesit-auto
                         jsdoc
                         json
                         lua
+                        markdown
                         ;; nix
                         python
                         rust
