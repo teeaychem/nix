@@ -1,5 +1,5 @@
 -*- mode: org -*-
-#+startup: show2levels
+#+startup: show3levels
 #+PROPERTY: header-args :results silent
 
 #+begin_src emacs-lisp
@@ -1257,20 +1257,21 @@ Supported values are `bottom' and `right'.")
 
 #+begin_src emacs-lisp
 (use-package compile-angel
+  :elpaca t
   :demand t
   :delight compile-angel-on-load-mode
 
   :config
-  (setq compile-angel-verbose t)
-  (push "early-init.el" compile-angel-excluded-files)
-  (push "config.el" compile-angel-excluded-files)
-  (push "config-darwin.el" compile-angel-excluded-files)
-  (push "config-org.el" compile-angel-excluded-files)
-  (push "custom.el" compile-angel-excluded-files)
-  (push "init.el" compile-angel-excluded-files)
+  (setq compile-angel-verbose nil)
+  (dolist (suffix '("/early-init.el"
+                    "/init.el"
+                    "/config.el"
+                    "/custom.el"))
+    (push suffix compile-angel-excluded-path-suffixes))
 
   (with-eval-after-load "savehist"
-    (push (concat "/" (file-name-nondirectory savehist-file)) compile-angel-excluded-files))
+    (push (concat "/" (file-name-nondirectory savehist-file))
+          compile-angel-excluded-path-suffixes))
 
   ;; Uncomment the line below to compile automatically when an Elisp file is saved
   ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
@@ -1894,18 +1895,9 @@ To highlight indentations
 
 * languages
 
+** internal packages
 
-** COMMENT ASP
-
-#+begin_src emacs-lisp
-;; (add-to-list 'load-path (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/"))
-(use-package clingo-asp-mode
-  :mode "\\.lp\\'"
-  :elpaca (:fetcher github :repo "teeaychem/clingo-asp-mode"))
-;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
-#+end_src
-
-** C/++
+*** C/++
 
 #+begin_src emacs-lisp
 (use-package c-ts-mode
@@ -1984,7 +1976,74 @@ To highlight indentations
          ("\\.cmake\\'" . cmake-ts-mode)))
 #+end_src
 
-** elf
+*** lua
+
+#+begin_src emacs-lisp
+(use-package lua-ts-mode
+  :elpaca nil
+
+  :custom
+  (lua-ts-indent-offset 2))
+#+end_src
+
+*** python
+
+#+begin_src emacs-lisp
+(use-package python
+  :elpaca nil
+
+  :custom
+  (python-indent-offset 4)
+  (python-indent-guess-indent-offset-verbose nil))
+#+end_src
+
+*** rust
+
+https://robert.kra.hn/posts/rust-emacs-setup/
+
+#+begin_src emacs-lisp
+(use-package rust-ts-mode
+  :elpaca nil
+
+  :mode ("\\.rs\\'" . rust-ts-mode)
+
+  :init
+  (defun my/rust-set-edition ()
+    "Set `rust-edition' from the current crate's Cargo metadata."
+    ;; https://github.com/radian-software/apheleia/issues/278
+    (when-let*
+        ((cratedir (locate-dominating-file default-directory "Cargo.toml"))
+         (manifest-path (expand-file-name "Cargo.toml" cratedir))
+         (env process-environment)
+         (path exec-path))
+      (setq-local rust-edition
+                  (with-temp-buffer
+                    (setq-local process-environment env)
+                    (setq-local exec-path path)
+                    (let ((retcode (process-file "cargo" nil (list (current-buffer) nil) nil "metadata" "--format-version" "1")))
+                      (when (/= retcode 0) (error "Cargo metadata --format-version 1 returned %s: %s" retcode (buffer-string)))
+                      (goto-char 0)
+                      (let ((metadata (json-parse-buffer :object-type 'alist :array-type 'list)))
+                        (cdr (assq 'edition (--first (string= (cdr (assq 'manifest_path it)) manifest-path) (cdr (assq 'packages metadata)))))))))))
+
+  :hook
+  (rust-ts-mode . my/rust-set-edition))
+#+end_src
+
+
+** external packages
+
+*** COMMENT ASP
+
+#+begin_src emacs-lisp
+;; (add-to-list 'load-path (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/"))
+(use-package clingo-asp-mode
+  :mode "\\.lp\\'"
+  :elpaca (:fetcher github :repo "teeaychem/clingo-asp-mode"))
+;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/")))
+#+end_src
+
+*** elf
 
 #+begin_src emacs-lisp
 (use-package elf-mode
@@ -1992,7 +2051,7 @@ To highlight indentations
   :magic ("ELF" . elf-mode))
 #+end_src
 
-** fish
+*** fish
 
 #+begin_src emacs-lisp
 (use-package fish-mode
@@ -2000,7 +2059,7 @@ To highlight indentations
   :mode "\\.fish\\'")
 #+end_src
 
-** LaTeX
+*** LaTeX
 
 #+begin_src emacs-lisp
 (use-package tex
@@ -2043,7 +2102,7 @@ To highlight indentations
   - option -r reloads the file; option -b highlights the current line; option -g opens Skim in the background
   - For this to work, it seems one needs no spaces in the file name
 
-** lean4
+*** lean4
 
 #+begin_src emacs-lisp
 (use-package nael-mode
@@ -2051,17 +2110,7 @@ To highlight indentations
   :mode "\\.lean\\'")
 #+end_src
 
-** lua
-
-#+begin_src emacs-lisp
-(use-package lua-ts-mode
-  :elpaca nil
-
-  :custom
-  (lua-ts-indent-offset 2))
-#+end_src
-
-** llvm
+*** llvm
 
 https://github.com/llvm/llvm-project.git
 
@@ -2098,9 +2147,7 @@ Get the relevant package subdirectories from the llvm source
                     my/tablegen-compilation-database))
   (put variable 'safe-local-variable #'stringp))
 
-(put 'my/mlir-extra-extensions
-     'safe-local-variable
-     (lambda (value) (and (listp value) (seq-every-p #'stringp value))))
+(put 'my/mlir-extra-extensions 'safe-local-variable (lambda (value) (and (listp value) (seq-every-p #'stringp value))))
 
 (defun my/mlir-mode-for-extra-extension ()
   "Use `mlir-mode' for project-local IR extensions."
@@ -2215,23 +2262,23 @@ Signal a user error when neither names an executable."
     :mode "\\.mir\\'"))
 #+end_src
 
-** COMMENT OCaml
+*** COMMENT OCaml
 
 #+begin_src emacs-lisp
 (use-package tuareg
   :elpaca t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
 
-(use-package dune :elpaca t)
+(use-package dune
+  :elpaca t)
 
 (use-package utop
   :elpaca t
 
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode)
-  (setq utop-command "opam exec -- utop -emacs")
   ;; (setq utop-command "opam exec -- dune utop . -- -emacs")
-  )
+  (setq utop-command "opam exec -- utop -emacs"))
 
 (use-package ocaml-eglot
   :elpaca t
@@ -2242,20 +2289,9 @@ Signal a user error when neither names an executable."
   (ocaml-eglot . eglot-ensure))
 #+end_src
 
-** python
-
 *** python
 
-#+begin_src emacs-lisp
-(use-package python
-  :elpaca nil
-
-  :custom
-  (python-indent-offset 4)
-  (python-indent-guess-indent-offset-verbose nil))
-#+end_src
-
-*** pet
+**** pet
 
 #+begin_src emacs-lisp
 (use-package pet
@@ -2282,7 +2318,7 @@ Signal a user error when neither names an executable."
   (add-hook 'python-base-mode-hook #'pet-mode -10))
 #+end_src
 
-*** uv
+**** uv
 
 #+begin_src emacs-lisp
 (use-package uv-mode
@@ -2292,7 +2328,7 @@ Signal a user error when neither names an executable."
   :hook (python-base-mode . uv-mode-auto-activate-hook))
 #+end_src
 
-** racket
+*** racket
 
 #+begin_src sh
 raco pkg install --auto drracket
@@ -2304,39 +2340,7 @@ raco pkg install --auto drracket
   :mode "\\.rkt\\'")
 #+end_src
 
-** rust
-
-https://robert.kra.hn/posts/rust-emacs-setup/
-
-#+begin_src emacs-lisp
-(use-package rust-ts-mode
-  :elpaca nil
-
-  :mode ("\\.rs\\'" . rust-ts-mode)
-
-  :init
-  (defun my/rust-set-edition ()
-    "Set `rust-edition' from the current crate's Cargo metadata."
-    ;; https://github.com/radian-software/apheleia/issues/278
-    (when-let*
-        ((cratedir (locate-dominating-file default-directory "Cargo.toml"))
-         (manifest-path (expand-file-name "Cargo.toml" cratedir))
-         (env process-environment)
-         (path exec-path))
-      (setq-local rust-edition
-                  (with-temp-buffer
-                    (setq-local process-environment env)
-                    (setq-local exec-path path)
-                    (let ((retcode (process-file "cargo" nil (list (current-buffer) nil) nil "metadata" "--format-version" "1")))
-                      (when (/= retcode 0) (error "Cargo metadata --format-version 1 returned %s: %s" retcode (buffer-string)))
-                      (goto-char 0)
-                      (let ((metadata (json-parse-buffer :object-type 'alist :array-type 'list)))
-                        (cdr (assq 'edition (--first (string= (cdr (assq 'manifest_path it)) manifest-path) (cdr (assq 'packages metadata)))))))))))
-
-  :hook
-  (rust-ts-mode . my/rust-set-edition))
-#+end_src
-
+*** rust
 
 #+begin_src emacs-lisp
 (use-package cargo
@@ -2424,16 +2428,16 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (org-pretty-entities-include-sub-superscripts nil)
 
   (org-replace-disputed-keys t)
-  (org-support-shift-select t)   ;; leave shift keys alone!
+  (org-support-shift-select t)  ;; leave shift keys alone!
 
   (org-src-fontify-natively t)
   (org-src-preserve-indentation t)
   (org-src-tab-acts-natively t)
   (org-src-window-setup 'current-window)
 
-  (org-startup-truncated nil) ;; wrap lines on startup
+  (org-startup-truncated nil)  ;; wrap lines on startup
 
-  (org-tag-column 0) ;; don't align tags
+  (org-tag-column 0)  ;; don't align tags
 
   (org-fontify-done-headline t)
   (org-fontify-whole-heading-line t)
@@ -2465,9 +2469,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   :demand t
 
   :init
-  (defvar my-org-directory
-    (file-name-as-directory (expand-file-name "~/org"))
-    "Directory containing Org notes.")
+  (defvar my-org-directory (file-name-as-directory (expand-file-name "~/org")) "Directory containing Org notes.")
 
   (define-prefix-command 'my-vulpea-prefix-map)
   (keymap-global-set "M-o f" #'vulpea-find)
@@ -2711,7 +2713,7 @@ These buffers can be seen by using space.
   :custom
   (corfu-cycle nil)
   (corfu-auto t)
-  (corfu-auto-delay 0.1)
+  (corfu-auto-delay 0.2)
   (corfu-separator ?\s)
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   (corfu-preselect 'directory) ;; Select the first candidate, except for directories
@@ -2741,10 +2743,8 @@ terminals."
                  (lambda (&optional params) (funcall make-frame-function (my/corfu-add-tty-child-frame-terminal params)))))
         (apply orig args))))
 
-  (advice-remove #'corfu--make-frame
-                 #'my/corfu-make-frame-with-explicit-tty-terminal)
-  (advice-add #'corfu--make-frame
-              :around #'my/corfu-make-frame-with-explicit-tty-terminal)
+  (advice-remove #'corfu--make-frame #'my/corfu-make-frame-with-explicit-tty-terminal)
+  (advice-add    #'corfu--make-frame :around #'my/corfu-make-frame-with-explicit-tty-terminal)
 
   (global-corfu-mode 1))
 #+end_src
@@ -2764,8 +2764,7 @@ terminals."
 
   :config
   ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" nil (window-parameters (mode-line-format . none))))
+  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" nil (window-parameters (mode-line-format . none))))
 
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -2796,7 +2795,6 @@ terminals."
   (marginalia-mode 1)
 
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle)))
-
 #+end_src
 
 ** orderless
@@ -2870,15 +2868,13 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-code-action-indications nil)
 
   :config
-  (defun my/mlir-eglot-setup ()
-    "Apply MLIR-specific Eglot adjustments."
-    ;; mlir-lsp-server advertises space as a completion trigger, which makes
-    ;; Corfu auto-complete eagerly after ordinary word separators.
-    (when-let* ((provider (eglot-server-capable :completionProvider))
-                ((listp provider))
-                (triggers (plist-get provider :triggerCharacters)))
-      (setf (plist-get provider :triggerCharacters)
-            (vconcat (remove " " (append triggers nil))))))
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when-let* (((derived-mode-p 'mlir-mode)
+                          (provider (eglot-server-capable :completionProvider))
+                          ((listp provider))
+                          (triggers (plist-get provider :triggerCharacters)))
+                (setf (plist-get provider :triggerCharacters) (vconcat (remove " " (append triggers nil)))))))
 
   (defun my/mlir-eglot-completion-at-point ()
     "Complete MLIR operation names after the final dot."
@@ -2895,13 +2891,10 @@ maybe: https://github.com/casouri/eldoc-box
 
   (add-hook 'eglot-managed-mode-hook #'my/mlir-eglot-capf-setup)
 
-  ;; (add-hook 'eglot-managed-mode-hook (lambda () (when (derived-mode-p 'mlir-mode) (my/mlir-eglot-setup))))
-
   ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (defun my/clangd--path-variants (path)
     "Return PATH and its canonical path when PATH is executable."
-    (when (and path (file-executable-p path))
-      (delete-dups (list (expand-file-name path) (file-truename path)))))
+    (when (and path (file-executable-p path)) (delete-dups (list (expand-file-name path) (file-truename path)))))
 
   (defun my/clangd--find-executables (names directories)
     "Find executable NAMES in DIRECTORIES and on `exec-path'."
@@ -2917,28 +2910,26 @@ maybe: https://github.com/casouri/eldoc-box
 
   (defun my/clangd--compiler-names (clangd)
     "Return standard compiler names matching CLANGD's version, if any."
-    (let ((names '("clang" "clang++")))
+    (let ((compilers '("clang" "clang++")) versioned)
       (dolist (path (my/clangd--path-variants clangd))
-        (when (string-match "\\`clangd\\(.+\\)\\'" (file-name-nondirectory path))
-          (let ((suffix (match-string 1 path)))
-            (setq names (append names
-                                (list (concat "clang" suffix)
-                                      (concat "clang++" suffix)))))))
-      (delete-dups names)))
+        (let ((basename (file-name-nondirectory path)))
+          (when (string-match "\\`clangd\\(.+\\)\\'" basename)
+            (let ((suffix (match-string 1 basename)))
+              (dolist (compiler compilers)
+                (push (concat compiler suffix) versioned))))))
+      (delete-dups (nconc compilers (nreverse versioned)))))
 
   (defun my/clangd-query-drivers (clangd)
     "Return trusted Clang driver paths associated with CLANGD.
 
-Both the symlink spelling and canonical path are included because compilation
-databases may use either.  `cc' and `c++' are included only when they resolve
-to one of the discovered Clang drivers."
+Both the symlink spelling and canonical path are included because compilation databases may use either.
+`cc' and `c++' are included only when they resolve to one of the discovered Clang drivers."
     (let* ((clangd-paths (my/clangd--path-variants clangd))
            (directories (delete-dups (mapcar #'file-name-directory clangd-paths)))
            (drivers (my/clangd--find-executables (my/clangd--compiler-names clangd) directories))
            (canonical-drivers (delete-dups (mapcar #'file-truename drivers)))
-           (aliases (delq nil
-                           (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
-                                   (my/clangd--find-executables '("cc" "c++") directories)))))
+           (aliases (delq nil (mapcar (lambda (path) (when (member (file-truename path) canonical-drivers) path))
+                                      (my/clangd--find-executables '("cc" "c++") directories)))))
       (delete-dups (apply #'append (mapcar #'my/clangd--path-variants (append drivers aliases))))))
 
   (defun my/eglot-clangd (&optional _interactive _project)
@@ -2957,12 +2948,6 @@ to one of the discovered Clang drivers."
                     (concat "-j=" clangd-jobs)))))
 
   (setf (alist-get '(c-ts-mode c++-ts-mode) eglot-server-programs nil nil #'equal) #'my/eglot-clangd)
-
-  (let* ((config-path (concat (getenv "XDG_CONFIG_HOME") "/.luarc.json"))
-         (lua-args (if (file-exists-p config-path)
-                       (list "lua-language-server" (concat "--configpath=" config-path))
-                     '("lua-language-server"))))
-    (setf (alist-get '(lua-mode lua-ts-mode) eglot-server-programs nil nil #'equal) lua-args))
 
   (add-to-list 'eglot-server-programs '(latex-mode . ("texlab")))
   (add-to-list 'eglot-server-programs '((cmake-ts-mode) . ("neocmakelsp" "stdio")))
@@ -3078,7 +3063,6 @@ for rust dev
 #+begin_src emacs-lisp
 (use-package consult-eglot
   :elpaca t
-
   :defer t)
 #+end_src
 
@@ -3220,31 +3204,16 @@ https://github.com/renzmann/treesit-auto
   (kill-emacs . dape-breakpoint-save)
 
   :config
-  ;; Restore these during startup, before a debugging session is requested.
-  (dape-breakpoint-load)
-
-  ;; Turn on global bindings for setting breakpoints with mouse
-  (dape-breakpoint-global-mode 1)
-
-  ;; Info buffers to the right
-  ;; (setq dape-buffer-window-arrangement 'right)
-
-  ;; Info buffers like gud (gdb-mi)
-  ;; (setq dape-buffer-window-arrangement 'gud)
+  (dape-breakpoint-load)  ;; Restore these during startup, before a debugging session is requested.
+  (dape-breakpoint-global-mode 1)  ;; Turn on global bindings for setting breakpoints with mouse
+  ;; (setq dape-buffer-window-arrangement 'right)  ;; Info buffers to the right
+  ;; (setq dape-buffer-window-arrangement 'gud)  ;; Info buffers like gud (gdb-mi)
   ;; (setq dape-info-hide-mode-line nil)
+  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)  ;; Pulse source line (performance hit)
 
-  ;; Pulse source line (performance hit)
-  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
-
-  ;; Showing inlay hints
-  (setq dape-inlay-hints t)
-
-  ;; Save modified file buffers before starting a debug session.
-  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
-
-  ;; Kill compile buffer on build success
-  ;; (add-hook 'dape-compile-hook 'kill-buffer)
-  )
+  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))  ;; Save modified file buffers before starting a debug session.
+  ;; (add-hook 'dape-compile-hook 'kill-buffer)  ;; Kill compile buffer on build success
+  (setq dape-inlay-hints t))
 #+end_src
 
 
