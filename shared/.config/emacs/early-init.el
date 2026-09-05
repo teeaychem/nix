@@ -8,7 +8,7 @@
 (setq package-native-compile t)
 
 (setq gc-cons-threshold (* 128 1024 1024))
-(run-with-idle-timer 2.0 t 'garbage-collect)
+(run-with-idle-timer 30 t 'garbage-collect)
 (setq garbage-collection-messages nil)
 
 (setq read-process-output-max (* 4 1024 1024))

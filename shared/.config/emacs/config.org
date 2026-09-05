@@ -26,12 +26,10 @@ https://www.emacswiki.org/emacs/GnusAuthinfo
 
 * to investigate
 
-https://whhone.com/emacs-config/
 https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
 
 
 * prerequisites
-
 ** delight
 
 #+begin_src emacs-lisp
@@ -44,23 +42,13 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 * general
 
 #+begin_src emacs-lisp
-;; Optimization from doom-start.el
-(setq auto-mode-case-fold nil)
-(setq-default bidi-display-reordering 'left-to-right)
-(setq-default bidi-paragraph-direction 'left-to-right)
-(setq bidi-inhibit-bpa t)
-#+end_src
-
-#+begin_src emacs-lisp
 (use-package emacs
   :init
+  (set-language-environment "UTF-8")
+  (setq locale-coding-system 'utf-8)
+
   ;; Add a prompt indicator to `completing-read-multiple', e.g. [CRM,].
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                  (car args))
-          (cdr args)))
+  (defun crm-indicator (args) (cons (format "[CRM%s] %s" (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator) (car args)) (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   (setq-default indent-tabs-mode nil)
@@ -75,54 +63,26 @@ https://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emac
 
   :custom
   (user-full-name "bsparkes")
-  (require-final-newline t)
-  (echo-keystrokes 0.1) ;; turn down time to echo keystrokes so no waiting for things to happen.
-  (sentence-end-double-space nil)
-  (enable-recursive-minibuffers t)
-  (tab-always-indent t)
-  (custom-buffer-indent 4)
-  (tab-width 2)
-  (translate-upper-case-key-bindings nil)
-  (mouse-yank-at-point t)
-  (kill-whole-line t)
-  ;; Hide commands in M-x which do not work in the current mode.
-  (read-extended-command-predicate #'command-completion-default-include-p)
-
-  (kill-do-not-save-duplicates t)
-  (save-interprogram-paste-before-kill t)
-
-  (delete-pair-push-mark t)
-  (kill-region-dwim 'emacs-word)
-  (view-lossage-auto-refresh t)
-  (display-fill-column-indicator-warning nil)
-  (world-clock-sort-order "%FT%T")
-
-  (window-combination-resize t)
 
   (auto-save-interval 200)
+  (delete-pair-push-mark t)
+  (echo-keystrokes 0.1) ;; turn down time to echo keystrokes so no waiting for things to happen.
+  (enable-recursive-minibuffers t)
+  (kill-do-not-save-duplicates t)
+  (kill-region-dwim 'emacs-word)
+  (kill-whole-line t)
+  (mouse-yank-at-point t)
+  (read-extended-command-predicate #'command-completion-default-include-p) ;; Hide commands in M-x which do not work in the current mode.
+  (require-final-newline t)
+  (save-interprogram-paste-before-kill t)
+  (sentence-end-double-space nil)
+  (translate-upper-case-key-bindings nil)
+  (view-lossage-auto-refresh t)
+  (window-combination-resize t)
 
   (minibuffer-prompt-properties '(read-only t
                                   cursor-intangible t
                                   face minibuffer-prompt)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package subword
-  :elpaca nil
-  :delight subword-mode
-
-  :init
-  (global-subword-mode 1))
-#+end_src
-
-
-** locale
-
-#+begin_src emacs-lisp
-(use-package emacs
-  :init
-  (set-language-environment "UTF-8")
-  (setq locale-coding-system 'utf-8))
 #+end_src
 
 ** saving & backups
@@ -134,9 +94,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 #+begin_src emacs-lisp
 (use-package emacs
   :init
-  (let ((backup-dir (concat user-emacs-directory "var/backups")))
-    (unless (file-directory-p backup-dir)
-      (make-directory backup-dir t)))
+  (make-directory (expand-file-name "var/backups/" user-emacs-directory) t)
 
   :custom
   (delete-by-moving-to-trash t)
@@ -154,8 +112,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * system
-
-
 ** darwin
 
 #+begin_src emacs-lisp
@@ -165,7 +121,7 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   :init
   (menu-bar-mode 1)
   (set-face-attribute 'default nil
-                      :family "M PLUS 1 Code" ; "Maple Mono NF" "JuliaMono"
+                      :family "M PLUS 1 Code"
                       :height 150)
 
   :config
@@ -186,8 +142,6 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
 
 
 * internal
-
-
 ** autorevert
 
 #+begin_src emacs-lisp
@@ -198,13 +152,12 @@ Parts from http://pragmaticemacs.com/emacs/auto-save-and-backup-every-save/
   (global-auto-revert-mode 1))
 
 (defun my/revert-all-buffers ()
-  "Immediately revert changed, unmodified file buffers.
-Unlike `auto-revert-buffers', this checks the file directly rather
-than waiting for a file-notification event."
+  "Immediately revert changed, unmodified file buffers. Unlike `auto-revert-buffers', this checks the file directly rather than waiting for a file-notification event."
   (interactive)
   (dolist (buffer (buffer-list))
     (with-current-buffer buffer
       (when (and buffer-file-name
+                 (file-exists-p buffer-file-name)
                  (not (file-remote-p buffer-file-name))
                  (not (buffer-modified-p))
                  (not (verify-visited-file-modtime buffer)))
@@ -237,42 +190,6 @@ than waiting for a file-notification event."
         ("j" . bookmark-jump)
         ("s" . bookmark-set-no-overwrite)
         ("S" . bookmark-set)))
-#+end_src
-
-** comint
-
-#+begin_src emacs-lisp
-(use-package comint
-  :elpaca nil
-
-  :custom
-  (comint-scroll-to-bottom-on-output t))
-#+end_src
-
-** dabbrev
-
-#+begin_src emacs-lisp
-(use-package dabbrev
-  :elpaca nil
-
-  :config
-  (dolist (regexp '("\\` "
-                    "\\.log\\'"
-                    "\\.min\\.js\\'"
-                    "\\.csv\\'"))
-    (add-to-list 'dabbrev-ignored-buffer-regexps regexp))
-
-  (dolist (mode '(authinfo-mode
-                  doc-view-mode
-                  pdf-view-mode
-                  tags-table-mode))
-    (add-to-list 'dabbrev-ignored-buffer-modes mode))
-
-  (advice-add 'dabbrev--find-expansion :around
-              (lambda (orig-fun &rest args)
-                (let ((inhibit-message t)
-                      (message-log-max nil))
-                  (apply orig-fun args)))))
 #+end_src
 
 ** desktop
@@ -338,19 +255,6 @@ than waiting for a file-notification event."
 
 ** eldoc
 
-*** eglot-signature-eldoc-talkative
-
-#+begin_src emacs-lisp
-(use-package eglot-signature-eldoc-talkative
-  :elpaca t
-  :after eglot
-
-  :config
-  (advice-add #'eglot-signature-eldoc-function :override #'eglot-signature-eldoc-talkative))
-#+end_src
-
-*** eldoc
-
 #+begin_src emacs-lisp
 (use-package eldoc
   :elpaca nil
@@ -410,7 +314,7 @@ Supported values are `bottom' and `right'.")
   :custom
   (eldoc-idle-delay 0.2)
   (eldoc-echo-area-display-truncation-message nil)
-  (eldoc-echo-area-prefer-doc-buffer t)
+  (eldoc-echo-area-prefer-doc-buffer 'maybe)
   (eldoc-echo-area-use-multiline-p 1)
   (eldoc-help-at-pt t)
   (eldoc-documentation-strategy #'eldoc-documentation-compose)
@@ -441,18 +345,24 @@ Supported values are `bottom' and `right'.")
   (defun my/visible-bell-invert ()
     "Briefly invert the mode line to provide a visible bell."
     (invert-face 'mode-line)
-    (run-with-timer 0.2 nil #'invert-face 'mode-line))
+  (run-with-timer 0.2 nil #'invert-face 'mode-line))
 
   :init
-  (setq-default fill-column 1024)
-  (setq-default indicate-empty-lines t)
-  (setq-default line-spacing nil)
+  ;; Redisplay optimizations from doom-start.el.
+  (setq-default bidi-display-reordering 'left-to-right)
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)
 
   (tool-bar-mode -1)
+  (tooltip-mode -1)
   ;; (scroll-bar-mode -1)
   ;; (horizontal-scroll-bar-mode -1)
 
   (set-frame-parameter nil 'internal-border-width 2)
+
+  (global-font-lock-mode 1)
+  (global-hi-lock-mode 1)
+  (global-visual-wrap-prefix-mode 1)
 
   :bind (:prefix-map format-prefix-map
          :prefix "C-c f")
@@ -460,20 +370,28 @@ Supported values are `bottom' and `right'.")
          :prefix "C-c s")
   :bind (:prefix-map goto-prefix-map
          :prefix "C-c g")
+  :bind (("C-<tab>" . #'completion-at-point)
+         ("<backtab>" . #'completion-at-point))
 
   :custom
-  (cursor-in-non-selected-windows t)
-  (fast-but-imprecise-scrolling t)
-  (redisplay-skip-fontification-on-input t)
   ;; (jit-lock-defer-time 0.1) ; Defer fontification while input is pending.
+
+  (comint-scroll-to-bottom-on-output t)
+  (cursor-in-non-selected-windows t)
+  (fill-column 1024)
+  (fast-but-imprecise-scrolling t)
+  (help-window-select t)
+  (indicate-empty-lines t)
+  (line-spacing nil)
+  (redisplay-skip-fontification-on-input t)
   (right-margin-width 1)
+  (ring-bell-function #'my/visible-bell-invert)
   (scroll-conservatively 101)
   (scroll-preserve-screen-position t)
   (truncate-string-ellipsis "…")
   (use-dialog-box nil)
   (use-short-answers t)
   (visible-bell t)
-  (ring-bell-function #'my/visible-bell-invert)
   (warning-minimum-level :error))
 #+end_src
 
@@ -484,6 +402,8 @@ Supported values are `bottom' and `right'.")
   :elpaca nil
 
   :init
+  (setq auto-mode-case-fold nil)
+
   (dolist (extension '(".DS_Store"
                        "__pycache__/"))
     (add-to-list 'completion-ignored-extensions extension))
@@ -493,42 +413,63 @@ Supported values are `bottom' and `right'.")
    ("s-u" . #'revert-buffer)))
 #+end_src
 
-** font-lock
+** flymake
 
-#+begin_src emacs-lisp
-(use-package font-lock
+#+begin_src emacs-lisp :results silent
+(use-package flymake
   :elpaca nil
+  :after eldoc
 
   :init
-  (global-font-lock-mode 1))
-#+end_src
+  (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
+                                 "--stdin-filename=stdin" "-"))
+  (setq rust-ts-flymake-command '("clippy-driver" "-"))
 
-#+begin_src emacs-lisp
-(use-package hi-lock
-  :elpaca nil
+  (defun flymake-next-error-error (&optional n interactive)
+    (interactive (list 1 t))
+    (flymake-goto-next-error n '(error) interactive))
 
-  :init
-  (global-hi-lock-mode 1))
-#+end_src
+  (defun flymake-prev-error-error (&optional n interactive)
+    (interactive (list 1 t))
+    (flymake-goto-prev-error n '(error) interactive))
 
-#+begin_src emacs-lisp
-(use-package treesit
-  :elpaca nil
+  (defun my/flymake-eldoc-function (_callback &rest _ignored)
+    "Return Flymake diagnostics at point for Eldoc."
+    (when-let* ((diagnostics (flymake-diagnostics (point))))
+      (mapconcat
+       (lambda (diagnostic)
+         (flymake-diagnostic-text
+          diagnostic
+          (or (alist-get :eldoc-echo flymake-diagnostic-format-alist) (alist-get t flymake-diagnostic-format-alist) '(origin code oneliner))))
+       diagnostics "\n")))
 
+  (defun my/flymake-eldoc-setup ()
+    "Add Flymake diagnostics to Eldoc in the current buffer."
+    (if flymake-mode
+        (add-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t t)
+      (remove-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t)))
+
+  :config
+  (setq flymake-diagnostic-format-alist '((t . (origin code message))))
+
+  :bind (:map goto-prefix-map
+              :prefix "d"
+              :prefix-map flymake-mode-prefix-map)
+
+  :bind (:repeat-map flymake-mode-prefix-map
+                     :exit
+                     :continue
+                     ("e" . flymake-goto-next-error)
+                     ("E" . flymake-next-error-error)
+                     ("a" . flymake-goto-prev-error)
+                     ("A" . flymake-prev-error-error))
   :custom
-  (treesit-auto-install-grammar t)
-  (treesit-enabled-modes t)
-  (treesit-font-lock-level 4))
-#+end_src
+  (flymake-margin-indicator-position 'right-margin)
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-wrap-around t)
 
-** help
-
-#+begin_src emacs-lisp
-(use-package help
-  :elpaca nil
-
-  :custom
-  (help-window-select t))
+  :hook
+  (flymake-mode . my/flymake-eldoc-setup))
 #+end_src
 
 ** isearch
@@ -567,17 +508,6 @@ Supported values are `bottom' and `right'.")
   )
 #+end_src
 
-** minibuffer
-
-#+begin_src emacs-lisp
-(use-package minibuffer
-  :elpaca nil
-
-  :bind
-  (("C-<tab>" . #'completion-at-point)
-   ("<backtab>" . #'completion-at-point)))
-#+end_src
-
 ** mouse
 
 #+begin_src emacs-lisp
@@ -601,6 +531,30 @@ Supported values are `bottom' and `right'.")
   (mouse-wheel-follow-mouse t))
 #+end_src
 
+** project
+
+#+begin_src emacs-lisp
+(use-package project
+  :elpaca nil
+
+  :custom
+  (project-mode-line 'non-remote)
+  (project-switch-commands
+   '((project-find-file "Find file" ?f)
+     (consult-ripgrep "Ripgrep" ?g)
+     (consult-project-buffer "Buffer" ?b)
+     (project-dired "Dired" ?d)
+     (project-compile "Compile" ?c)
+     (project-eshell "Eshell" ?e)))
+  (project-vc-extra-root-markers
+   '("INSTALL_RECEIPT.json" ;; brewed libraries, etc.
+     ".project"             ;; custom
+     ".dir-locals.el"))
+
+  :bind (:map project-prefix-map
+              ("R" . project-remember-projects-under)
+              ("Z" . project-forget-zombie-projects)))
+#+end_src
 ** recentf
 
 #+begin_src emacs-lisp
@@ -702,6 +656,7 @@ Supported values are `bottom' and `right'.")
 
   :config
   (keymap-global-unset "C-_")
+  (keymap-global-unset "C-x m")
   (keymap-global-unset "C-z")
   (keymap-global-unset "M-z")
 
@@ -733,8 +688,7 @@ Supported values are `bottom' and `right'.")
   (defconst slash-escaped-pairs
     '((?\( . ?\))
       (?\[ . ?\])
-      (?\{ . ?\}))
-    "Opening and closing characters for backslash-escaped pairs.")
+      (?\{ . ?\})))
 
   (defun insert-pair-or-slash-escaped-pair (arg)
     "Insert ARG copies of the typed character, pairing slash-escaped delimiters."
@@ -753,14 +707,15 @@ Supported values are `bottom' and `right'.")
     (keymap-global-set (string opening-char) #'insert-pair-or-slash-escaped-pair)))
 #+end_src
 
-** tooltip
+** subword
 
 #+begin_src emacs-lisp
-(use-package tooltip
+(use-package subword
   :elpaca nil
+  :delight subword-mode
 
   :init
-  (tooltip-mode -1))
+  (global-subword-mode 1))
 #+end_src
 
 ** tramp
@@ -786,6 +741,18 @@ Supported values are `bottom' and `right'.")
   (tramp-verbose 2))
 #+end_src
 
+** treesit
+
+#+begin_src emacs-lisp
+(use-package treesit
+  :elpaca nil
+
+  :custom
+  (treesit-auto-install-grammar t)
+  (treesit-enabled-modes t)
+  (treesit-font-lock-level 4))
+#+end_src
+
 ** uniquify
 
 #+begin_src emacs-lisp
@@ -795,16 +762,6 @@ Supported values are `bottom' and `right'.")
   :custom
   (uniquify-after-kill-buffer-flag t)
   (uniquify-buffer-name-style 'forward))
-#+end_src
-
-** visual-wrap
-
-#+begin_src emacs-lisp
-(use-package visual-wrap
-  :elpaca nil
-
-  :init
-  (global-visual-wrap-prefix-mode 1))
 #+end_src
 
 ** xclip
@@ -916,93 +873,6 @@ Supported values are `bottom' and `right'.")
 #+end_src
 
 
-* internal elpaca
-
-
-** flymake
-
-#+begin_src emacs-lisp :results silent
-(use-package flymake
-  :elpaca nil
-  :after eldoc
-
-  :init
-  (setq python-flymake-command '("ruff" "check" "--quiet" "--output-format=concise"
-                                 "--stdin-filename=stdin" "-"))
-  (setq rust-ts-flymake-command '("clippy-driver" "-"))
-
-  (defun flymake-next-error-error (&optional n interactive)
-    (interactive (list 1 t))
-    (flymake-goto-next-error n '(error) interactive))
-
-  (defun flymake-prev-error-error (&optional n interactive)
-    (interactive (list 1 t))
-    (flymake-goto-prev-error n '(error) interactive))
-
-  (defun my/flymake-eldoc-function (_callback &rest _ignored)
-    "Return Flymake diagnostics at point for Eldoc."
-    (when-let* ((diagnostics (flymake-diagnostics (point))))
-      (mapconcat
-       (lambda (diagnostic)
-         (flymake-diagnostic-text
-          diagnostic
-          (or (alist-get :eldoc-echo flymake-diagnostic-format-alist) (alist-get t flymake-diagnostic-format-alist) '(origin code oneliner))))
-       diagnostics "\n")))
-
-  (defun my/flymake-eldoc-setup ()
-    "Add Flymake diagnostics to Eldoc in the current buffer."
-    (if flymake-mode
-        (add-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t t)
-      (remove-hook 'eldoc-documentation-functions #'my/flymake-eldoc-function t)))
-
-  :config
-  (setq flymake-diagnostic-format-alist '((t . (origin code message))))
-
-  :bind (:map goto-prefix-map
-              :prefix "d"
-              :prefix-map flymake-mode-prefix-map)
-
-  :bind (:repeat-map flymake-mode-prefix-map
-                     :exit
-                     :continue
-                     ("e" . flymake-goto-next-error)
-                     ("E" . flymake-next-error-error)
-                     ("a" . flymake-goto-prev-error)
-                     ("A" . flymake-prev-error-error))
-  :custom
-  (flymake-margin-indicator-position 'right-margin)
-  (flymake-fringe-indicator-position 'right-fringe)
-  (flymake-wrap-around t)
-
-  :hook
-  (flymake-mode . my/flymake-eldoc-setup))
-#+end_src
-
-** project
-
-#+begin_src emacs-lisp
-(use-package project
-  :elpaca nil
-
-  :custom
-  (project-mode-line 'non-remote)
-  (project-switch-commands
-   '((project-find-file "Find file" ?f)
-     (consult-ripgrep "Ripgrep" ?g)
-     (consult-project-buffer "Buffer" ?b)
-     (project-dired "Dired" ?d)
-     (project-compile "Compile" ?c)
-     (project-eshell "Eshell" ?e)))
-  (project-vc-extra-root-markers
-   '("INSTALL_RECEIPT.json" ;; brewed libraries, etc.
-     ".project"             ;; custom
-     ".dir-locals.el"))
-
-  :bind (:map project-prefix-map
-              ("R" . project-remember-projects-under)
-              ("Z" . project-forget-zombie-projects)))
-#+end_src
-
 
 * other configs
 
@@ -1025,8 +895,6 @@ Supported values are `bottom' and `right'.")
 
 
 * theme
-
-
 ** batppuccin
 
 #+begin_src emacs-lisp
@@ -1055,9 +923,7 @@ Supported values are `bottom' and `right'.")
 #+end_src
 
 
-
 * developed
-
 ** named desktop
 
 #+begin_src emacs-lisp
@@ -1081,18 +947,6 @@ Supported values are `bottom' and `right'.")
 
 
 * external, etc.
-
-
-** avy
-
-#+begin_src emacs-lisp
-(use-package avy
-  :elpaca t
-  :bind (("C-'" . avy-goto-char-timer)
-         ("M-g w" . avy-goto-word-1)
-         ("M-g l" . avy-goto-line)))
-#+end_src
-
 ** apheleia
 
 #+begin_src emacs-lisp
@@ -1251,33 +1105,6 @@ Supported values are `bottom' and `right'.")
 
   :hook
   (prog-mode . breadcrumb-local-mode))
-#+end_src
-
-** COMMENT compile-angel
-
-#+begin_src emacs-lisp
-(use-package compile-angel
-  :elpaca t
-  :demand t
-  :delight compile-angel-on-load-mode
-
-  :config
-  (setq compile-angel-verbose nil)
-  (dolist (suffix '("/early-init.el"
-                    "/init.el"
-                    "/config.el"
-                    "/custom.el"))
-    (push suffix compile-angel-excluded-path-suffixes))
-
-  (with-eval-after-load "savehist"
-    (push (concat "/" (file-name-nondirectory savehist-file))
-          compile-angel-excluded-path-suffixes))
-
-  ;; Uncomment the line below to compile automatically when an Elisp file is saved
-  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
-
-  ;; A global mode that compiles .el files before they are loaded using `load' or `require'.
-  (compile-angel-on-load-mode 1))
 #+end_src
 
 ** crux
@@ -1532,12 +1359,6 @@ To highlight indentations
   :demand t
 
   :config
-  (defun my/kkp-ignore-dead-delete-frame (orig-fun &optional frame &rest args)
-    "Skip KKP frame teardown when FRAME has already been deleted."
-    (when (or (null frame) (frame-live-p frame)) (apply orig-fun frame args)))
-
-  (advice-add #'kkp--pre-delete-frame :around #'my/kkp-ignore-dead-delete-frame)
-
   (global-kkp-mode 1))
 #+end_src
 
@@ -1710,8 +1531,6 @@ To highlight indentations
 
 
 * undo and redo
-
-
 ** undo-fu
 
 #+begin_src emacs-lisp
@@ -1755,8 +1574,6 @@ To highlight indentations
 
 
 * vc
-
-
 ** blamer
 
 #+begin_src emacs-lisp
@@ -1800,18 +1617,16 @@ To highlight indentations
 
   :config
   (defun my/vc-git-expand-root (root) (when root (expand-file-name root)))
+  (defun my/diff-hl-recenter-after-navigation (&rest _) (when (called-interactively-p 'interactive) (recenter)))
+
   (advice-add 'vc-git-root :filter-return #'my/vc-git-expand-root)
+  (advice-add 'diff-hl-next-hunk :after #'my/diff-hl-recenter-after-navigation)
+  (advice-add 'diff-hl-previous-hunk :after #'my/diff-hl-recenter-after-navigation)
+
   (global-diff-hl-mode 1)
   (diff-hl-margin-mode 1)
   (diff-hl-flydiff-mode -1)
   (diff-hl-show-hunk-mouse-mode -1)
-  (defun my/diff-hl-recenter-after-navigation (&rest _) (when (called-interactively-p 'interactive) (recenter)))
-  (advice-add 'diff-hl-next-hunk :after #'my/diff-hl-recenter-after-navigation)
-  (advice-add 'diff-hl-previous-hunk :after #'my/diff-hl-recenter-after-navigation)
-  ;; (diff-hl-update-async t)
-  ;; (set-face-attribute 'diff-hl-change nil :background (face-attribute 'default :background))
-  ;; (set-face-attribute 'diff-hl-insert nil :background (face-attribute 'default :background))
-  ;; (set-face-attribute 'diff-hl-delete nil :background (face-attribute 'default :background))
 
   :hook
   (magit-pre-refresh . diff-hl-magit-pre-refresh)
@@ -1894,9 +1709,7 @@ To highlight indentations
 
 
 * languages
-
-** internal packages
-
+** internal
 *** C/++
 
 #+begin_src emacs-lisp
@@ -2030,19 +1843,7 @@ https://robert.kra.hn/posts/rust-emacs-setup/
   (rust-ts-mode . my/rust-set-edition))
 #+end_src
 
-
-** external packages
-
-*** COMMENT ASP
-
-#+begin_src emacs-lisp
-;; (add-to-list 'load-path (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/"))
-(use-package clingo-asp-mode
-  :mode "\\.lp\\'"
-  :elpaca (:fetcher github :repo "teeaychem/clingo-asp-mode"))
-;;   :load-path (lambda() (concat user-emacs-directory "../../projects/emacs/clingo-asp-mode/"))
-#+end_src
-
+** external
 *** elf
 
 #+begin_src emacs-lisp
@@ -2117,26 +1918,19 @@ https://github.com/llvm/llvm-project.git
 Get the relevant package subdirectories from the llvm source
 
 #+begin_src emacs-lisp
-(defvar-local my/mlir-pdll-lsp-server-bin nil
-  "PDLL language server executable for this buffer or project.")
+(defvar-local my/mlir-pdll-lsp-server-bin      nil               "PDLL language server executable for this buffer or project.")
 
-(defvar-local my/mlir-lsp-server-bin "mlir-lsp-server"
-  "MLIR language server executable for this buffer or project.")
+(defvar-local my/mlir-lsp-server-bin           "mlir-lsp-server" "MLIR language server executable for this buffer or project.")
 
-(defvar-local my/pdll-compilation-database nil
-  "PDLL compilation database for this buffer or project.")
+(defvar-local my/pdll-compilation-database     nil                "PDLL compilation database for this buffer or project.")
 
-(defvar-local my/tablegen-lsp-server-bin nil
-  "TableGen language server executable for this buffer or project.")
+(defvar-local my/tablegen-lsp-server-bin       nil                "TableGen language server executable for this buffer or project.")
 
-(defvar-local my/tablegen-compilation-database nil
-  "TableGen compilation database for this buffer or project.")
+(defvar-local my/tablegen-compilation-database nil                "TableGen compilation database for this buffer or project.")
 
-(defvar-local my/mlir-extra-extensions nil
-  "Project-local file extensions that should use `mlir-mode'.")
+(defvar-local my/mlir-extra-extensions         nil                "Project-local file extensions that should use `mlir-mode'.")
 
-(defvar-local my/mlir-extra-extension-applying nil
-  "Non-nil while applying project-local `mlir-mode' extension rules.")
+(defvar-local my/mlir-extra-extension-applying nil                "Non-nil while applying project-local `mlir-mode' extension rules.")
 
 (dolist (variable '(my/llvm-source-root
                     my/mlir-opt-bin
@@ -2154,9 +1948,7 @@ Get the relevant package subdirectories from the llvm source
   (when-let* ((file buffer-file-name)
               (extensions my/mlir-extra-extensions)
               (extension (file-name-extension file)))
-    (when (and (not my/mlir-extra-extension-applying)
-               (not (derived-mode-p 'mlir-mode))
-               (member extension extensions))
+    (when (and (not my/mlir-extra-extension-applying) (not (derived-mode-p 'mlir-mode)) (member extension extensions))
       (let ((my/mlir-extra-extension-applying t))
         (mlir-mode)))))
 
@@ -2171,8 +1963,7 @@ Get the relevant package subdirectories from the llvm source
   (and (stringp path) (not (string= path "")) (file-readable-p path)))
 
 (defun my/llvm-lsp-server-path (setting path fallback interactive)
-  "Return explicit PATH, or FALLBACK from `exec-path' when INTERACTIVE.
-Signal a user error when neither names an executable."
+  "Return explicit PATH, or FALLBACK from `exec-path' when INTERACTIVE. Signal a user error when neither names an executable."
   (cond
    ((my/llvm-file-executable-p path) path)
    ((and interactive (executable-find fallback)))
@@ -2218,7 +2009,9 @@ Signal a user error when neither names an executable."
 (defun my/elpaca-llvm-source (e)
   "Populate LLVM source files for E using sparse checkout."
   (setf (elpaca<-build-steps e) (append my/elpaca-llvm-source-steps (elpaca<-build-steps e))) (elpaca-continue e))
+#+end_src
 
+#+begin_src emacs-lisp
 (elpaca (llvm-project-modes :host github :repo "llvm/llvm-project" :files ("llvm/utils/emacs/*.el" "mlir/utils/emacs/*.el") :main nil :build (:sub elpaca-source my/elpaca-llvm-source))
   (use-package mlir-mode
     :elpaca nil
@@ -2262,33 +2055,6 @@ Signal a user error when neither names an executable."
     :mode "\\.mir\\'"))
 #+end_src
 
-*** COMMENT OCaml
-
-#+begin_src emacs-lisp
-(use-package tuareg
-  :elpaca t
-  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
-
-(use-package dune
-  :elpaca t)
-
-(use-package utop
-  :elpaca t
-
-  :config
-  (add-hook 'tuareg-mode-hook #'utop-minor-mode)
-  ;; (setq utop-command "opam exec -- dune utop . -- -emacs")
-  (setq utop-command "opam exec -- utop -emacs"))
-
-(use-package ocaml-eglot
-  :elpaca t
-  :after tuareg
-
-  :hook
-  (tuareg-mode . ocaml-eglot)
-  (ocaml-eglot . eglot-ensure))
-#+end_src
-
 *** python
 
 **** pet
@@ -2299,10 +2065,8 @@ Signal a user error when neither names an executable."
 
   :custom
   (python-shell-interpreter "python")
-  ;; PET can parse pyproject.toml/pixi.toml/hatch.toml and YAML config files
-  ;; with external tools such as dasel, or optional Elisp parsers. Without one
-  ;; of those, simple .venv/VIRTUAL_ENV projects still work, but metadata-based
-  ;; environment managers are less reliable.
+  ;; PET can parse pyproject.toml/pixi.toml/hatch.toml and YAML config files with external tools such as dasel, or optional Elisp parsers.
+  ;; Without one of those, simple .venv/VIRTUAL_ENV projects still work, but metadata-based environment managers are less reliable.
   (pet-find-file-functions '(pet-find-file-from-project-root
                              pet-locate-dominating-file
                              pet-find-file-from-project-root-natively))
@@ -2316,16 +2080,6 @@ Signal a user error when neither names an executable."
 
   :init
   (add-hook 'python-base-mode-hook #'pet-mode -10))
-#+end_src
-
-**** uv
-
-#+begin_src emacs-lisp
-(use-package uv-mode
-  :elpaca t
-  :disabled
-
-  :hook (python-base-mode . uv-mode-auto-activate-hook))
 #+end_src
 
 *** racket
@@ -2351,9 +2105,8 @@ raco pkg install --auto drracket
 
 
 * markup
-
-
-** json
+** internal
+*** json
 
 #+begin_src emacs-lisp
 (use-package json-ts-mode
@@ -2361,7 +2114,7 @@ raco pkg install --auto drracket
   :mode ("\\.json\\'" . json-ts-mode))
 #+end_src
 
-** markdown
+*** markdown
 
 #+begin_src emacs-lisp
 (use-package markdown-ts-mode
@@ -2373,7 +2126,24 @@ raco pkg install --auto drracket
   (markdown-ts-fontify-code-blocks-natively t))
 #+end_src
 
-** math-preview
+*** toml
+
+#+begin_src emacs-lisp
+(use-package toml-ts-mode
+  :elpaca nil
+  :mode ("\\.toml\\'" . toml-ts-mode))
+#+end_src
+
+*** yaml
+
+#+begin_src emacs-lisp
+(use-package yaml-ts-mode
+  :elpaca nil
+  :mode ("\\.ya?ml\\'" . yaml-ts-mode))
+#+end_src
+
+** external
+*** math-preview
 
 #+begin_src emacs-lisp
 (use-package math-preview
@@ -2384,26 +2154,8 @@ raco pkg install --auto drracket
   (math-preview-command "~/.npm-packages/bin/math-preview"))
 #+end_src
 
-** toml
-
-#+begin_src emacs-lisp
-(use-package toml-ts-mode
-  :elpaca nil
-  :mode ("\\.toml\\'" . toml-ts-mode))
-#+end_src
-
-** yaml
-
-#+begin_src emacs-lisp
-(use-package yaml-ts-mode
-  :elpaca nil
-  :mode ("\\.ya?ml\\'" . yaml-ts-mode))
-#+end_src
-
 
 * org
-
-
 ** org
 
 #+begin_src emacs-lisp
@@ -2506,8 +2258,6 @@ raco pkg install --auto drracket
 
 
 * completion
-
-
 ** cape
 
 #+begin_src emacs-lisp
@@ -2750,7 +2500,6 @@ terminals."
 #+end_src
 
 ** embark
-
 *** embark
 
 #+begin_src emacs-lisp
@@ -2805,7 +2554,6 @@ terminals."
   :demand t
 
   :custom
-  ;; (completion-category-overrides '((file (styles partial-completion))))
   (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
   (completion-category-overrides nil))
@@ -2842,8 +2590,6 @@ terminals."
 
 
 * eglot
-
-
 ** eglot
 
 maybe: https://github.com/casouri/eldoc-box
@@ -2862,7 +2608,6 @@ maybe: https://github.com/casouri/eldoc-box
   (eglot-extend-to-xref t)
   (corfu-preview-current nil)
   (eglot-events-buffer-config '(:size 0 :format short))
-  ;; (eglot-confirm-server-edits t)
   (jsonrpc-event-hook nil)
   (eglot-documentation-renderer 'markdown-ts-view-mode)
   (eglot-code-action-indications nil)
@@ -2870,10 +2615,8 @@ maybe: https://github.com/casouri/eldoc-box
   :config
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
-              (when-let* (((derived-mode-p 'mlir-mode))
-                          (provider (eglot-server-capable :completionProvider))
-                          ((listp provider))
-                          (triggers (plist-get provider :triggerCharacters)))
+              (when-let* (((derived-mode-p 'mlir-mode)) (provider (eglot-server-capable :completionProvider))
+                          ((listp provider))            (triggers (plist-get provider :triggerCharacters)))
                 (setf (plist-get provider :triggerCharacters) (vconcat (remove " " (append triggers nil)))))))
 
   (defun my/mlir-eglot-completion-at-point ()
@@ -3066,32 +2809,8 @@ for rust dev
   :defer t)
 #+end_src
 
-** workspaces
-
-#+begin_src emacs-lisp
-;; (add-hook 'python-base-mode-hook
-;;           (lambda ()
-;;             (setq-default eglot-workspace-configuration
-;;                           '((:pyright . (
-;;                                          :analyzeUnannotatedFunctions :json-false
-;;                                          :reportAttributeAccessIssue :json-false
-;;                                          :reportGeneralTypeIssues :json-false
-;;                                          :reportMissingTypeStubs :json-false
-;;                                          :reportPropertyTypeMismatch :json-false
-;;                                          :reportUnusedClass :json-false
-;;                                          :reportUnusedFunction :json-false
-;;                                          :reportUnusedImport :json-false
-;;                                          :reportUnusedVariable :json-false
-;;                                          :strictParameterNoneValue :json-false
-;;                                          :typeCheckingMode "off"
-;;                                          :useLibraryCodeForTypes :json-false
-;;                                          :verboseOutput :json-false))))))
-#+end_src
-
 
 * tree sitter
-
-
 ** combobulate
 
 #+begin_src emacs-lisp
@@ -3124,12 +2843,9 @@ https://github.com/renzmann/treesit-auto
                         json
                         lua
                         markdown
-                        ;; nix
                         python
                         rust
                         toml
-                        tsx
-                        typescript
                         yaml))
 
   :init
@@ -3183,10 +2899,7 @@ https://github.com/renzmann/treesit-auto
 #+end_src
 
 
-* debugging
-
-
-** dap
+* dape
 
 #+begin_src emacs-lisp
 (use-package dape
@@ -3218,9 +2931,7 @@ https://github.com/renzmann/treesit-auto
 
 
 * terminal
-
 See https://whhone.com/emacs-config/#enable-lexical-binding for some fixes
-
 
 ** clipetty
 
