@@ -190,6 +190,8 @@ support_kitty_keyboard_protocol true
 //
 show_startup_tips false
 
+mouse_hover_tips false
+
 // show_release_notes false
 
 // Whether to enable mouse hover effects and pane grouping functionality
