@@ -57,9 +57,6 @@ export SAVEHIST=10000                # Maximum events in history file
 
 
 
-# # npm / node
-# export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
-
 # # OCaml
 # export OPAMROOT="${XDG_DATA_HOME}/opam"
 

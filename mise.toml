@@ -15,7 +15,6 @@ MANPAGER = "nvim +Man!"
 FD_OPTIONS = "--hidden --follow"
 FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git"
 
-NPM_CONFIG_USERCONFIG = "{{xdg_config_home}}/npm/npmrc"
 OPAMROOT = "{{xdg_data_home}}/opam"
 
 PYTHONPYCACHEPREFIX = "{{xdg_cache_home}}/python_cache"
@@ -35,7 +34,6 @@ LLVM_SRC = "{{env.HOME}}/repos/llvm"
 [env._]
 path = [
   "{{env.HOME}}/.cargo/bin",
-  "{{env.HOME}}/.npm-packages/bin",
   "{{env.HOME}}/.local/bin",
   "{{env.ELAN_HOME}}/bin",
 ]
