@@ -488,7 +488,9 @@ Supported values are `bottom' and `right'.")
   :bind (:map isearch-mode-map
               ("C-o" . isearch-occur)
               ("M-%" . isearch-query-replace)
-              ("C-M-%" . isearch-query-replace-regexp)))
+              ("M-S-5" . isearch-query-replace)
+              ("C-M-%" . isearch-query-replace-regexp)
+              ("C-M-S-5" . isearch-query-replace-regexp)))
 #+end_src
 
 ** ispell
@@ -1359,7 +1361,28 @@ To highlight indentations
   :demand t
 
   :config
-  (global-kkp-mode 1))
+  (global-kkp-mode 1)
+
+  ;; KKP preserves Shift on printable keys. Mirror the standard Meta
+  ;; punctuation bindings on their physical KKP events.
+  (dolist (binding '(("M-S-1" . "M-!")
+                     ("M-S-4" . "M-$")
+                     ("M-S-5" . "M-%")
+                     ("M-S-7" . "M-&")
+                     ("M-S-9" . "M-(")
+                     ("M-S-0" . "M-)")
+                     ("M-S-;" . "M-:")
+                     ("M-S-," . "M-<")
+                     ("M-S-." . "M->")
+                     ("M-S-/" . "M-?")
+                     ("M-S-2" . "M-@")
+                     ("M-S-6" . "M-^")
+                     ("M-S-[" . "M-{")
+                     ("M-S-]" . "M-}")
+                     ("M-S-\\" . "M-|")
+                     ("M-S-=" . "M-=")))
+    (global-set-key (kbd (car binding))
+                    (key-binding (kbd (cdr binding))))))
 #+end_src
 
 ** meow
@@ -2184,16 +2207,6 @@ raco pkg install --auto drracket
 #+end_src
 
 ** external
-*** math-preview
-
-#+begin_src emacs-lisp
-(use-package math-preview
-  :elpaca (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview" :branch "master")
-  :defer t
-
-  :custom
-  (math-preview-command "~/.npm-packages/bin/math-preview"))
-#+end_src
 
 
 * org
@@ -2366,6 +2379,7 @@ raco pkg install --auto drracket
    ("C-c i" . consult-info)
    ;; C-x bindings in `ctl-x-map'
    ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x M-S-;" . consult-complex-command)   ;; KKP alias for C-x M-:
    ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
    ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
    ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
@@ -2499,7 +2513,8 @@ These buffers can be seen by using space.
               ;; ("C-SPC" . corfu-insert-separator)
               ("RET" . nil) ;; Free the RET key for less intrusive behavior.
               ("C-<return>" . corfu-insert)
-              ("M-_" . corfu-info-documentation))
+              ("M-_" . corfu-info-documentation)
+              ("M-S--" . corfu-info-documentation))
 
   :custom
   (corfu-cycle nil)
@@ -2913,7 +2928,9 @@ https://github.com/renzmann/treesit-auto
   :elpaca t
 
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-S-=" . tempel-complete)
          ("M-*" . tempel-insert)
+         ("M-S-8" . tempel-insert)
          :map tempel-map
          ("C-c RET" . tempel-done)
          ("C-<up>" . tempel-previous)
