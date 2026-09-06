@@ -1,0 +1,30 @@
+{
+  "title": "Mouse tab navigation",
+  "rules": [
+    {
+      "description": "Mouse side buttons: previous and next tab",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": { "pointing_button": "button5" },
+          "to": [
+            {
+              "key_code": "open_bracket",
+              "modifiers": ["left_command", "left_shift"]
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "from": { "pointing_button": "button4" },
+          "to": [
+            {
+              "key_code": "close_bracket",
+              "modifiers": ["left_command", "left_shift"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
