@@ -629,6 +629,7 @@ Supported values are `bottom' and `right'.")
 #+begin_src emacs-lisp
 (use-package simple
   :elpaca nil
+  :delight visual-line-mode
 
   :preface
   (defun my/backward-delete-word (arg)
@@ -1309,14 +1310,13 @@ To highlight indentations
   (indent-bars-starting-column 0)
   (indent-bars-color '(highlight :face-bg default :default "#ffffff"))
   (indent-bars-highlight-current-depth '(:face default :color "#ffaa00"))
-  (indent-bars-color-by-depth
-   '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
-               "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
-               "#7a7f55"   ; Depth 3: Sage/Muted Yellow-Green
-               "#557f6a"   ; Depth 4: Dark Seafoam / Cloudy Teal
-               "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
-               "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
-               "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
+  (indent-bars-color-by-depth '(:palette ("#7f5555"   ; Depth 1: Stormy Muted Red
+                                          "#7f6a55"   ; Depth 2: Overcast Ochre/Orange
+                                          "#7a7f55"   ; Depth 3: Sage/Muted Yellow-Green
+                                          "#557f6a"   ; Depth 4: Dark Seafoam / Cloudy Teal
+                                          "#556a7f"   ; Depth 5: Slate Blue / Rainy Sky
+                                          "#6a557f"   ; Depth 6: Muted Indigo / Shadow Purple
+                                          "#7f556a"))) ; Depth 7: Dusty Rose / Fading Violet
   (indent-bars-width-frac 0.2)
   (indent-bars-pad-frac 0.1)
   (indent-bars-depth-update-delay 0.1)
@@ -1326,9 +1326,9 @@ To highlight indentations
   (indent-bars-treesit-support t)
   (indent-bars-ts-out-of-scope-color '(:face default :color "#808080"))
   (indent-bars-treesit-wrap '((python argument_list parameters
-				                              list list_comprehension
-				                              dictionary dictionary_comprehension
-				                              parenthesized_expression subscript)
+				      list list_comprehension
+				      dictionary dictionary_comprehension
+				      parenthesized_expression subscript)
                               (c argument_list parameter_list init_declarator
                                  parenthesized_expression)
                               (cpp argument_list parameter_list init_declarator
@@ -1336,7 +1336,7 @@ To highlight indentations
   (indent-bars-treesit-scope '((python function_definition
                                        class_definition
                                        for_statement
-				                               if_statement
+				       if_statement
                                        with_statement
                                        while_statement)
                                (cpp function_definition
@@ -2301,6 +2301,7 @@ raco pkg install --auto drracket
 (use-package consult-vulpea
   :elpaca (consult-vulpea :type git :host github :repo "fabcontigiani/consult-vulpea")
   :after vulpea
+  :delight consult-vulpea-mode
 
   :init
   (keymap-set my-vulpea-prefix-map "d" #'consult-vulpea-find)
